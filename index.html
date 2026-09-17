@@ -16,6 +16,7 @@
 <style>
 :root {
   --bg:      oklch(10% 0 0);
+  --bg-glass:oklch(10% 0 0 / 0.82);
   --bg2:     oklch(15% 0 0);
   --bg3:     oklch(20% 0 0);
   --bg4:     oklch(26% 0 0);
@@ -78,6 +79,12 @@ body::before {
 .screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
 .screen.active { display: flex; flex-direction: column; }
 .screen.active > * { flex-shrink: 0; }
+.home-top, .add-top, .history-top, .settings-top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 20px -14px oklch(0% 0 0 / 0.6);
+}
 
 /* ── HOME ── */
 .home-top { padding: 22px 20px 14px; flex-shrink: 0; }

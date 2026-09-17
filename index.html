@@ -19,7 +19,7 @@
   --bg2:     oklch(15% 0.028 165);
   --bg3:     oklch(19% 0.032 165);
   --bg4:     oklch(23% 0.035 165);
-  --border:  oklch(27% 0.035 165);
+  --border:  oklch(27% 0.035 165 / 0.65);
   --gold:    oklch(80% 0.15  85);
   --gold-d:  oklch(80% 0.15  85 / 0.14);
   --rose:    oklch(74% 0.17  355);
@@ -94,7 +94,8 @@ body::before {
 .summary-total { font-size: 2.5rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
 .summary-stats { display: flex; gap: 18px; margin-top: 16px; }
 .summary-stat { flex: 1; }
-.summary-stat .lbl { font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.summary-stat .lbl { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.summary-stat .lbl svg { width: 12px; height: 12px; flex-shrink: 0; }
 .summary-stat .val { font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
 .val.pos { color: var(--green); }
 .val.neg { color: var(--red); }
@@ -106,7 +107,8 @@ body::before {
   background: var(--bg2); border: 1px solid var(--border); cursor: pointer; transition: transform .12s, background .15s;
 }
 .bucket-card:active { transform: scale(0.98); background: var(--bg3); }
-.bucket-dot { width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; }
+.bucket-dot { width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.bucket-dot svg { width: 20px; height: 20px; }
 .bucket-info { flex: 1; min-width: 0; }
 .bucket-name-row { display: flex; align-items: center; gap: 8px; }
 .bucket-name { font-weight: 700; font-size: 0.92rem; }
@@ -179,7 +181,8 @@ input[type=date] { color-scheme: dark; }
 .settings-list { padding: 10px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
 .settings-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; }
 .settings-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.settings-dot { width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0; }
+.settings-dot { width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.settings-dot svg { width: 15px; height: 15px; }
 .settings-card input[type=text] { padding: 9px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
 .settings-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .settings-row label { font-size: 0.72rem; color: var(--dim); font-weight: 600; width: 62px; flex-shrink: 0; }
@@ -234,11 +237,11 @@ input[type=date] { color-scheme: dark; }
       <div class="summary-total mono" id="summary-total">$0</div>
       <div class="summary-stats">
         <div class="summary-stat">
-          <div class="lbl">Total Income</div>
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>Income</div>
           <div class="val pos mono" id="summary-income">$0</div>
         </div>
         <div class="summary-stat">
-          <div class="lbl">Total Spent</div>
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>Spent</div>
           <div class="val neg mono" id="summary-spent">$0</div>
         </div>
       </div>
@@ -338,7 +341,17 @@ const ICONS = {
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>',
-  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>'
+  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  trendUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+  award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+  gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  anchor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>'
 };
 
 const COLORS = {
@@ -354,14 +367,15 @@ const COLORS = {
   lime:    { solid: 'var(--lime)',    dim: 'var(--lime-d)' },
 };
 const COLOR_PALETTE = Object.keys(COLORS);
+const ICON_PALETTE = ['home', 'heart', 'trendUp', 'flag', 'award', 'star', 'compass', 'gift', 'briefcase', 'anchor'];
 
 const DEFAULT_STATE = {
   buckets: [
-    { id: 'essentials', name: 'Essentials',       color: 'gold',    pct: 55, balance: 0, goal: null, initial: '55%' },
-    { id: 'guiltfree',  name: 'Guilt-Free',        color: 'rose',    pct: 5,  balance: 0, goal: null, initial: '5%' },
-    { id: 'payoff',     name: 'Payoff / Invest',   color: 'orange',  pct: 10, balance: 0, goal: null, initial: '10%' },
-    { id: 'save',       name: 'Save Toward Goal',  color: 'sky',     pct: 15, balance: 0, goal: null, initial: '15%' },
-    { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', pct: 15, balance: 0, goal: null, initial: '15%' },
+    { id: 'essentials', name: 'Essentials',       color: 'gold',    icon: 'home',    pct: 55, balance: 0, goal: null },
+    { id: 'guiltfree',  name: 'Guilt-Free',        color: 'rose',    icon: 'heart',   pct: 5,  balance: 0, goal: null },
+    { id: 'payoff',     name: 'Payoff / Invest',   color: 'orange',  icon: 'trendUp', pct: 10, balance: 0, goal: null },
+    { id: 'save',       name: 'Save Toward Goal',  color: 'sky',     icon: 'flag',    pct: 15, balance: 0, goal: null },
+    { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', icon: 'award',   pct: 15, balance: 0, goal: null },
   ],
   transactions: [],
 };
@@ -375,6 +389,11 @@ function load() {
     if (!raw) return structuredClone(DEFAULT_STATE);
     const parsed = JSON.parse(raw);
     if (!parsed.buckets || !parsed.transactions) return structuredClone(DEFAULT_STATE);
+    let migrated = false;
+    parsed.buckets.forEach((b, i) => {
+      if (!b.icon || !ICONS[b.icon]) { b.icon = ICON_PALETTE[i % ICON_PALETTE.length]; migrated = true; }
+    });
+    if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
 }
@@ -424,9 +443,9 @@ function renderHome() {
         <div class="bucket-goal-txt">${fmt(b.balance)} of ${fmt(b.goal)} goal</div>`;
     }
     card.innerHTML = `
-      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${b.pct}%</div>
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
       <div class="bucket-info">
-        <div class="bucket-name-row"><span class="bucket-name">${b.name}</span></div>
+        <div class="bucket-name-row"><span class="bucket-name">${b.name}</span><span class="bucket-pct">${b.pct}%</span></div>
         <div class="bucket-balance mono">${fmt(b.balance)}</div>
         ${goalHtml}
       </div>
@@ -583,7 +602,7 @@ function renderSettings() {
       ? `<div class="icon-del-btn" data-del-bucket="${b.id}">${ICONS.trash}</div>` : '';
     card.innerHTML = `
       <div class="settings-card-head">
-        <div class="settings-dot" style="background:${c.solid}"></div>
+        <div class="settings-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
         <input type="text" value="${b.name}" data-field="name" data-id="${b.id}">
         ${delBtn}
       </div>
@@ -652,8 +671,10 @@ function renderSettings() {
 
   addBucketBtn.addEventListener('click', () => {
     applyPendingSettingsEdits();
-    const color = COLOR_PALETTE[state.buckets.length % COLOR_PALETTE.length];
-    state.buckets.push({ id: uid(), name: 'New Bucket', color, pct: 0, balance: 0, goal: null });
+    const idx = state.buckets.length % COLOR_PALETTE.length;
+    const color = COLOR_PALETTE[idx];
+    const icon = ICON_PALETTE[idx];
+    state.buckets.push({ id: uid(), name: 'New Bucket', color, icon, pct: 0, balance: 0, goal: null });
     save();
     renderSettings();
   });

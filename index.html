@@ -30,6 +30,16 @@
   --sky-d:   oklch(76% 0.12  220 / 0.14);
   --emerald: oklch(76% 0.16  155);
   --emerald-d:oklch(76% 0.16 155 / 0.14);
+  --violet:  oklch(72% 0.18  300);
+  --violet-d:oklch(72% 0.18  300 / 0.14);
+  --cyan:    oklch(78% 0.11  200);
+  --cyan-d:  oklch(78% 0.11  200 / 0.14);
+  --amber:   oklch(78% 0.16  70);
+  --amber-d: oklch(78% 0.16  70 / 0.14);
+  --pink:    oklch(76% 0.19  340);
+  --pink-d:  oklch(76% 0.19  340 / 0.14);
+  --lime:    oklch(80% 0.15  130);
+  --lime-d:  oklch(80% 0.15  130 / 0.14);
   --text:    oklch(96% 0.008 165);
   --dim:     oklch(58% 0.02  165);
   --red:     oklch(62% 0.22  25);
@@ -173,10 +183,17 @@ input[type=date] { color-scheme: dark; }
 .settings-card input[type=text] { padding: 9px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
 .settings-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .settings-row label { font-size: 0.72rem; color: var(--dim); font-weight: 600; width: 62px; flex-shrink: 0; }
-.settings-row input[type=number] { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-weight: 600; outline: none; }
-.pct-sum-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 700; }
+.settings-row input[type=number] { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-weight: 600; outline: none; text-align: center; }
+.stepper-row { display: flex; align-items: center; gap: 8px; flex: 1; }
+.stepper-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--text); cursor: pointer; flex-shrink: 0; user-select: none; transition: transform .1s; }
+.stepper-btn:active { transform: scale(0.9); }
+.icon-del-btn { width: 32px; height: 32px; border-radius: 10px; background: var(--bg3); display: flex; align-items: center; justify-content: center; color: var(--dim); flex-shrink: 0; cursor: pointer; }
+.icon-del-btn svg { width: 16px; height: 16px; }
+.settings-card input[type=text][data-field="name"] { flex: 1; margin-bottom: 0; }
+.pct-sum-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 700; margin-bottom: 12px; }
 .pct-sum-bar.ok { color: var(--green); border-color: var(--green); }
 .pct-sum-bar.bad { color: var(--red); border-color: var(--red); }
+.add-bucket-btn { margin-bottom: 4px; }
 .danger-zone { margin-top: 8px; padding-top: 14px; border-top: 1px dashed var(--border); }
 
 /* ── MODAL / SHEET ── */
@@ -317,7 +334,7 @@ input[type=date] { color-scheme: dark; }
 const ICONS = {
   target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
-  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
   chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',
   up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>',
@@ -330,7 +347,13 @@ const COLORS = {
   orange:  { solid: 'var(--orange)',  dim: 'var(--orange-d)' },
   sky:     { solid: 'var(--sky)',     dim: 'var(--sky-d)' },
   emerald: { solid: 'var(--emerald)', dim: 'var(--emerald-d)' },
+  violet:  { solid: 'var(--violet)',  dim: 'var(--violet-d)' },
+  cyan:    { solid: 'var(--cyan)',    dim: 'var(--cyan-d)' },
+  amber:   { solid: 'var(--amber)',   dim: 'var(--amber-d)' },
+  pink:    { solid: 'var(--pink)',    dim: 'var(--pink-d)' },
+  lime:    { solid: 'var(--lime)',    dim: 'var(--lime-d)' },
 };
+const COLOR_PALETTE = Object.keys(COLORS);
 
 const DEFAULT_STATE = {
   buckets: [
@@ -463,7 +486,7 @@ let selectedExpenseBucket = null;
 function renderExpenseChips() {
   const row = document.getElementById('exp-buckets');
   row.innerHTML = '';
-  if (!selectedExpenseBucket) selectedExpenseBucket = state.buckets[0].id;
+  if (!selectedExpenseBucket || !bucket(selectedExpenseBucket)) selectedExpenseBucket = state.buckets[0].id;
   state.buckets.forEach(b => {
     const chip = document.createElement('div');
     chip.className = 'chip' + (b.id === selectedExpenseBucket ? ' active' : '');
@@ -539,6 +562,16 @@ function renderHistory() {
 }
 
 /* ── SETTINGS ── */
+function applyPendingSettingsEdits() {
+  document.querySelectorAll('#settings-list input[data-field]').forEach(input => {
+    const b = bucket(input.dataset.id);
+    if (!b) return;
+    if (input.dataset.field === 'name') b.name = input.value.trim() || b.name;
+    if (input.dataset.field === 'pct') b.pct = Math.max(0, Math.min(100, parseFloat(input.value) || 0));
+    if (input.dataset.field === 'goal') b.goal = input.value ? parseFloat(input.value) : null;
+  });
+}
+
 function renderSettings() {
   const list = document.getElementById('settings-list');
   list.innerHTML = '';
@@ -546,14 +579,21 @@ function renderSettings() {
     const c = COLORS[b.color];
     const card = document.createElement('div');
     card.className = 'settings-card';
+    const delBtn = state.buckets.length > 1
+      ? `<div class="icon-del-btn" data-del-bucket="${b.id}">${ICONS.trash}</div>` : '';
     card.innerHTML = `
       <div class="settings-card-head">
         <div class="settings-dot" style="background:${c.solid}"></div>
         <input type="text" value="${b.name}" data-field="name" data-id="${b.id}">
+        ${delBtn}
       </div>
       <div class="settings-row">
         <label>Percent</label>
-        <input type="number" min="0" max="100" step="1" value="${b.pct}" data-field="pct" data-id="${b.id}">
+        <div class="stepper-row">
+          <div class="stepper-btn" data-step="-1" data-id="${b.id}">&minus;</div>
+          <input type="number" min="0" max="100" step="1" value="${b.pct}" data-field="pct" data-id="${b.id}">
+          <div class="stepper-btn" data-step="1" data-id="${b.id}">+</div>
+        </div>
       </div>
       <div class="settings-row">
         <label>Goal</label>
@@ -561,6 +601,12 @@ function renderSettings() {
       </div>`;
     list.appendChild(card);
   });
+
+  const addBucketBtn = document.createElement('button');
+  addBucketBtn.className = 'btn-primary btn-ghost add-bucket-btn';
+  addBucketBtn.textContent = '+ Add Bucket';
+  addBucketBtn.id = 'add-bucket-btn';
+  list.appendChild(addBucketBtn);
 
   const sumBar = document.createElement('div');
   sumBar.id = 'pct-sum-bar';
@@ -587,22 +633,64 @@ function renderSettings() {
     document.getElementById('settings-save').disabled = sum !== 100;
   }
   list.querySelectorAll('input[data-field="pct"]').forEach(i => i.addEventListener('input', updateSumBar));
+  list.querySelectorAll('.stepper-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = list.querySelector(`input[data-field="pct"][data-id="${btn.dataset.id}"]`);
+      const next = Math.max(0, Math.min(100, (parseFloat(input.value) || 0) + parseFloat(btn.dataset.step)));
+      input.value = next;
+      updateSumBar();
+    });
+  });
   updateSumBar();
 
   saveBtn.addEventListener('click', () => {
-    list.querySelectorAll('input[data-field]').forEach(input => {
-      const b = bucket(input.dataset.id);
-      if (!b) return;
-      if (input.dataset.field === 'name') b.name = input.value.trim() || b.name;
-      if (input.dataset.field === 'pct') b.pct = parseFloat(input.value) || 0;
-      if (input.dataset.field === 'goal') b.goal = input.value ? parseFloat(input.value) : null;
-    });
+    applyPendingSettingsEdits();
     save();
     renderHome();
     switchTab('home');
   });
 
+  addBucketBtn.addEventListener('click', () => {
+    applyPendingSettingsEdits();
+    const color = COLOR_PALETTE[state.buckets.length % COLOR_PALETTE.length];
+    state.buckets.push({ id: uid(), name: 'New Bucket', color, pct: 0, balance: 0, goal: null });
+    save();
+    renderSettings();
+  });
+
+  list.querySelectorAll('[data-del-bucket]').forEach(el => {
+    el.addEventListener('click', () => openDeleteBucketConfirm(el.dataset.delBucket));
+  });
+
   document.getElementById('reset-data-btn').addEventListener('click', openResetConfirm);
+}
+
+function openDeleteBucketConfirm(id) {
+  const b = bucket(id);
+  if (!b || state.buckets.length <= 1) return;
+  const balanceNote = b.balance !== 0
+    ? ` It currently holds ${fmt(b.balance)}, which will be permanently removed.`
+    : '';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Delete "${b.name}"?</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="confirm-text">This removes the bucket and its percentage allocation.${balanceNote} Past transactions logged to it stay in History but will show as unassigned.</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-del-bucket" style="flex:1">Cancel</button>
+      <button class="btn-primary btn-danger" id="confirm-del-bucket" style="flex:1">Delete</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-del-bucket').addEventListener('click', closeSheet);
+  document.getElementById('confirm-del-bucket').addEventListener('click', () => {
+    applyPendingSettingsEdits();
+    state.buckets = state.buckets.filter(x => x.id !== id);
+    if (selectedExpenseBucket === id) selectedExpenseBucket = null;
+    if (currentHistFilter === id) currentHistFilter = 'all';
+    save();
+    closeSheet();
+    renderSettings();
+  });
 }
 
 /* ── MODALS ── */

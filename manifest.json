@@ -1,0 +1,16 @@
+{
+  "name": "Wealth Split",
+  "short_name": "Wealth Split",
+  "description": "Split every paycheck into Essentials, Guilt-Free, Payoff/Invest, Save Toward Goal, and Long-Term Wealth buckets.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a120e",
+  "theme_color": "#0a120e",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any" }
+  ]
+}

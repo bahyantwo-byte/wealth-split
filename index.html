@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wealth Split">
-<meta name="theme-color" content="#0a120e">
+<meta name="theme-color" content="#0a0a0a">
 <title>Wealth Split</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-512.png">
@@ -15,35 +15,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:      oklch(11% 0.024 165);
-  --bg2:     oklch(15% 0.028 165);
-  --bg3:     oklch(19% 0.032 165);
-  --bg4:     oklch(23% 0.035 165);
-  --border:  oklch(27% 0.035 165 / 0.65);
-  --gold:    oklch(80% 0.15  85);
-  --gold-d:  oklch(80% 0.15  85 / 0.14);
-  --rose:    oklch(74% 0.17  355);
-  --rose-d:  oklch(74% 0.17  355 / 0.14);
-  --orange:  oklch(72% 0.17  45);
-  --orange-d:oklch(72% 0.17  45 / 0.14);
-  --sky:     oklch(76% 0.12  220);
-  --sky-d:   oklch(76% 0.12  220 / 0.14);
-  --emerald: oklch(76% 0.16  155);
-  --emerald-d:oklch(76% 0.16 155 / 0.14);
-  --violet:  oklch(72% 0.18  300);
-  --violet-d:oklch(72% 0.18  300 / 0.14);
-  --cyan:    oklch(78% 0.11  200);
-  --cyan-d:  oklch(78% 0.11  200 / 0.14);
-  --amber:   oklch(78% 0.16  70);
-  --amber-d: oklch(78% 0.16  70 / 0.14);
-  --pink:    oklch(76% 0.19  340);
-  --pink-d:  oklch(76% 0.19  340 / 0.14);
-  --lime:    oklch(80% 0.15  130);
-  --lime-d:  oklch(80% 0.15  130 / 0.14);
-  --text:    oklch(96% 0.008 165);
-  --dim:     oklch(58% 0.02  165);
-  --red:     oklch(62% 0.22  25);
-  --green:   oklch(72% 0.17  150);
+  --bg:      oklch(10% 0 0);
+  --bg2:     oklch(15% 0 0);
+  --bg3:     oklch(20% 0 0);
+  --bg4:     oklch(26% 0 0);
+  --border:  oklch(32% 0 0 / 0.65);
+  --gold:    oklch(95% 0 0);
+  --gold-d:  oklch(95% 0 0 / 0.14);
+  --rose:    oklch(90% 0 0);
+  --rose-d:  oklch(90% 0 0 / 0.14);
+  --orange:  oklch(85% 0 0);
+  --orange-d:oklch(85% 0 0 / 0.14);
+  --sky:     oklch(80% 0 0);
+  --sky-d:   oklch(80% 0 0 / 0.14);
+  --emerald: oklch(75% 0 0);
+  --emerald-d:oklch(75% 0 0 / 0.14);
+  --violet:  oklch(70% 0 0);
+  --violet-d:oklch(70% 0 0 / 0.14);
+  --cyan:    oklch(65% 0 0);
+  --cyan-d:  oklch(65% 0 0 / 0.14);
+  --amber:   oklch(60% 0 0);
+  --amber-d: oklch(60% 0 0 / 0.14);
+  --pink:    oklch(55% 0 0);
+  --pink-d:  oklch(55% 0 0 / 0.14);
+  --lime:    oklch(52% 0 0);
+  --lime-d:  oklch(52% 0 0 / 0.14);
+  --text:    oklch(97% 0 0);
+  --dim:     oklch(58% 0 0);
+  --red:     oklch(55% 0 0);
+  --green:   oklch(94% 0 0);
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -60,8 +60,8 @@ body {
 body::before {
   content: '';
   position: fixed; inset: 0;
-  background: radial-gradient(ellipse at 15% 0%, oklch(76% 0.16 155 / 0.08) 0%, transparent 55%),
-              radial-gradient(ellipse at 85% 100%, oklch(80% 0.15 85 / 0.06) 0%, transparent 55%);
+  background: radial-gradient(ellipse at 15% 0%, oklch(100% 0 0 / 0.06) 0%, transparent 55%),
+              radial-gradient(ellipse at 85% 100%, oklch(100% 0 0 / 0.04) 0%, transparent 55%);
   pointer-events: none; z-index: 0;
 }
 .mono { font-family: 'DM Mono', monospace; }
@@ -72,7 +72,7 @@ body::before {
 .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); cursor: pointer; transition: color .2s, transform .15s; }
 .tab:active { transform: scale(0.92); }
 .tab svg { width: 21px; height: 21px; stroke-width: 1.8; }
-.tab.active { color: var(--emerald); }
+.tab.active { color: var(--text); }
 
 /* ── SCREENS ── */
 .screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
@@ -88,7 +88,7 @@ body::before {
 }
 .summary-card::after {
   content: ''; position: absolute; top: -40%; right: -20%; width: 60%; height: 140%;
-  background: radial-gradient(circle, var(--emerald-d) 0%, transparent 70%); pointer-events: none;
+  background: radial-gradient(circle, oklch(100% 0 0 / 0.05) 0%, transparent 70%); pointer-events: none;
 }
 .summary-label { font-size: 0.72rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
 .summary-total { font-size: 2.5rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
@@ -141,7 +141,7 @@ input[type=date] { color-scheme: dark; }
   padding: 10px 14px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border);
   font-size: 0.82rem; font-weight: 700; color: var(--dim); cursor: pointer; transition: all .15s;
 }
-.chip.active { border-color: var(--emerald); color: var(--text); background: var(--emerald-d); }
+.chip.active { border-color: var(--text); color: var(--text); background: var(--bg4); }
 .preview-box { margin-top: 4px; border-radius: 16px; background: var(--bg2); border: 1px solid var(--border); overflow: hidden; }
 .preview-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .preview-row:last-child { border-bottom: none; }
@@ -150,12 +150,12 @@ input[type=date] { color-scheme: dark; }
 .preview-row .pamt { font-weight: 700; font-size: 0.9rem; }
 .bucket-balance-hint { font-size: 0.78rem; color: var(--dim); margin-top: 8px; }
 .btn-primary {
-  width: 100%; padding: 15px; border-radius: 16px; border: none; background: var(--emerald); color: oklch(15% 0.03 155);
+  width: 100%; padding: 15px; border-radius: 16px; border: none; background: var(--text); color: var(--bg);
   font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 6px; transition: transform .12s, opacity .15s; font-family: inherit;
 }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.4; }
-.btn-danger { background: var(--red); color: white; }
+.btn-danger { background: transparent; color: var(--text); border: 1.5px solid var(--text); }
 
 /* ── HISTORY ── */
 .history-top { padding: 22px 20px 12px; flex-shrink: 0; }
@@ -194,8 +194,10 @@ input[type=date] { color-scheme: dark; }
 .icon-del-btn svg { width: 16px; height: 16px; }
 .settings-card input[type=text][data-field="name"] { flex: 1; margin-bottom: 0; }
 .pct-sum-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 700; margin-bottom: 12px; }
-.pct-sum-bar.ok { color: var(--green); border-color: var(--green); }
-.pct-sum-bar.bad { color: var(--red); border-color: var(--red); }
+.pct-sum-bar .pct-sum-label { display: flex; align-items: center; gap: 8px; }
+.pct-sum-bar .pct-sum-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pct-sum-bar.ok { color: var(--text); border-color: var(--text); }
+.pct-sum-bar.bad { color: var(--dim); border-style: dashed; }
 .add-bucket-btn { margin-bottom: 4px; }
 .danger-zone { margin-top: 8px; padding-top: 14px; border-top: 1px dashed var(--border); }
 
@@ -351,7 +353,9 @@ const ICONS = {
   compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
   gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
   briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
-  anchor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>'
+  anchor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
 };
 
 const COLORS = {
@@ -647,8 +651,9 @@ function renderSettings() {
     let sum = 0;
     inputs.forEach(i => sum += parseFloat(i.value) || 0);
     const bar = document.getElementById('pct-sum-bar');
-    bar.className = 'pct-sum-bar ' + (sum === 100 ? 'ok' : 'bad');
-    bar.innerHTML = `<span>Total Allocation</span><span>${sum}%</span>`;
+    const ok = sum === 100;
+    bar.className = 'pct-sum-bar ' + (ok ? 'ok' : 'bad');
+    bar.innerHTML = `<span class="pct-sum-label">${ok ? ICONS.check : ICONS.alert}Total Allocation</span><span>${sum}%</span>`;
     document.getElementById('settings-save').disabled = sum !== 100;
   }
   list.querySelectorAll('input[data-field="pct"]').forEach(i => i.addEventListener('input', updateSumBar));

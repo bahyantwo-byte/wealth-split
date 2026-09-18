@@ -110,6 +110,13 @@ body::before {
 }
 .summary-label { font-size: 0.72rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
 .summary-total { font-size: 2.5rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
+.summary-available-row {
+  display: flex; align-items: center; justify-content: space-between; margin-top: 12px;
+  padding-top: 12px; border-top: 1px solid var(--border);
+}
+.summary-available-lbl { font-size: 0.78rem; color: var(--dim); font-weight: 600; }
+.summary-available-val { font-size: 1.2rem; font-weight: 800; }
+.summary-available-val.neg { color: var(--dim); }
 .summary-stats { display: flex; gap: 18px; margin-top: 16px; }
 .summary-stat { flex: 1; }
 .summary-stat .lbl { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -300,6 +307,10 @@ input:focus { border-color: var(--dim); }
     <div class="summary-card">
       <div class="summary-label">Total Across Buckets</div>
       <div class="summary-total mono" id="summary-total">$0</div>
+      <div class="summary-available-row">
+        <span class="summary-available-lbl">Available to spend</span>
+        <span class="summary-available-val mono" id="summary-available">$0</span>
+      </div>
       <div class="summary-stats">
         <div class="summary-stat">
           <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>Income</div>
@@ -556,6 +567,10 @@ function renderHome() {
   document.getElementById('summary-total').textContent = fmt(total);
   document.getElementById('summary-income').textContent = fmt(totalIncome);
   document.getElementById('summary-spent').textContent = fmt(totalSpent);
+  const available = totalIncome - totalSpent;
+  const availableEl = document.getElementById('summary-available');
+  availableEl.textContent = fmt(available);
+  availableEl.classList.toggle('neg', available < 0);
 
   const list = document.getElementById('bucket-list');
   list.innerHTML = '';

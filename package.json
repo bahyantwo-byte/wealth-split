@@ -1,0 +1,28 @@
+{
+  "name": "wealth-split",
+  "version": "1.0.0",
+  "description": "Wealth Split budgeting PWA, packaged as a native app shell with Capacitor.",
+  "scripts": {
+    "sync": "cp index.html manifest.json sw.js www/ && cp -r icons www/ && cap sync",
+    "open:android": "cap open android"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bahyantwo-byte/wealth-split.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bahyantwo-byte/wealth-split/issues"
+  },
+  "homepage": "https://github.com/bahyantwo-byte/wealth-split#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.5.2"
+  }
+}

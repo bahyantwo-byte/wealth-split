@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wealth Split">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Split every paycheck into percentage-based buckets and track balances, goals, and spending against them.">
+<title>Wealth Split</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-512.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      oklch(10% 0 0);
+  --bg-glass:oklch(10% 0 0 / 0.82);
+  --bg2:     oklch(15% 0 0);
+  --bg3:     oklch(20% 0 0);
+  --bg4:     oklch(26% 0 0);
+  --border:  oklch(32% 0 0 / 0.65);
+  --gold:    oklch(95% 0 0);
+  --gold-d:  oklch(95% 0 0 / 0.14);
+  --rose:    oklch(90% 0 0);
+  --rose-d:  oklch(90% 0 0 / 0.14);
+  --orange:  oklch(85% 0 0);
+  --orange-d:oklch(85% 0 0 / 0.14);
+  --sky:     oklch(80% 0 0);
+  --sky-d:   oklch(80% 0 0 / 0.14);
+  --emerald: oklch(75% 0 0);
+  --emerald-d:oklch(75% 0 0 / 0.14);
+  --violet:  oklch(70% 0 0);
+  --violet-d:oklch(70% 0 0 / 0.14);
+  --cyan:    oklch(65% 0 0);
+  --cyan-d:  oklch(65% 0 0 / 0.14);
+  --amber:   oklch(60% 0 0);
+  --amber-d: oklch(60% 0 0 / 0.14);
+  --pink:    oklch(55% 0 0);
+  --pink-d:  oklch(55% 0 0 / 0.14);
+  --lime:    oklch(52% 0 0);
+  --lime-d:  oklch(52% 0 0 / 0.14);
+  --text:    oklch(97% 0 0);
+  --dim:     oklch(58% 0 0);
+  --red:     oklch(55% 0 0);
+  --green:   oklch(94% 0 0);
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { overscroll-behavior: none; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  min-height: 100dvh;
+  overflow: hidden;
+  user-select: none;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: radial-gradient(ellipse at 15% 0%, oklch(100% 0 0 / 0.06) 0%, transparent 55%),
+              radial-gradient(ellipse at 85% 100%, oklch(100% 0 0 / 0.04) 0%, transparent 55%);
+  pointer-events: none; z-index: 0;
+}
+.mono { font-family: 'DM Mono', monospace; }
+.app { display: flex; flex-direction: column; height: 100dvh; padding-top: var(--safe-top); position: relative; z-index: 1; }
+
+/* ── TAB BAR ── */
+.tabbar { display: flex; background: var(--bg2); border-top: 1px solid var(--border); padding-bottom: var(--safe-bottom); flex-shrink: 0; }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 0 8px; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--dim); cursor: pointer; transition: color .2s, transform .15s; }
+.tab:active { transform: scale(0.92); }
+.tab svg { width: 21px; height: 21px; stroke-width: 1.8; }
+.tab.active { color: var(--text); }
+
+/* ── SCREENS ── */
+.screen { display: none; flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.screen.active { display: flex; flex-direction: column; }
+.screen.active > * { flex-shrink: 0; }
+.home-top, .add-top, .history-top, .settings-top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 20px -14px oklch(0% 0 0 / 0.6);
+}
+
+/* ── HOME ── */
+.home-top { padding: 22px 20px 14px; flex-shrink: 0; }
+.home-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.home-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+.home-greeting { font-size: 1.25rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.01em; }
+.avatar-btn {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;
+  color: var(--text); cursor: pointer; flex-shrink: 0; transition: transform .12s;
+}
+.avatar-btn:active { transform: scale(0.9); }
+.avatar-btn svg { width: 18px; height: 18px; color: var(--dim); }
+.summary-card {
+  margin: 14px 20px 8px; padding: 22px 20px; border-radius: 22px;
+  background: linear-gradient(155deg, var(--bg3), var(--bg2));
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.summary-card::after {
+  content: ''; position: absolute; top: -40%; right: -20%; width: 60%; height: 140%;
+  background: radial-gradient(circle, oklch(100% 0 0 / 0.05) 0%, transparent 70%); pointer-events: none;
+}
+.summary-label { font-size: 0.72rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.summary-total { font-size: 2.5rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
+.summary-total.neg { color: var(--dim); }
+.summary-stats { display: flex; gap: 18px; margin-top: 16px; }
+.summary-stat { flex: 1; }
+.summary-stat .lbl { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.summary-stat .lbl svg { width: 12px; height: 12px; flex-shrink: 0; }
+.summary-stat .val { font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
+#spent-stat-btn { cursor: pointer; transition: transform .12s; }
+#spent-stat-btn:active { transform: scale(0.96); }
+.spend-cat-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.spend-cat-list { display: flex; flex-direction: column; }
+.val.pos { color: var(--green); }
+.val.neg { color: var(--red); }
+
+.section-title { padding: 18px 20px 8px; font-size: 0.95rem; font-weight: 700; color: var(--text); }
+.pie-card { margin: 4px 20px 0; }
+.pie-chart-wrap { position: relative; width: 100%; aspect-ratio: 340 / 300; }
+.pie-chart-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pie-center { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); text-align: center; pointer-events: none; }
+.pie-center-amt { font-size: 1.05rem; font-weight: 800; }
+.pie-center-lbl { font-size: 0.6rem; color: var(--dim); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 1px; }
+.pie-tag {
+  position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 5px;
+  background: var(--bg2); border: 1px solid var(--border); padding: 4px 9px 4px 6px; border-radius: 20px;
+  font-size: 0.66rem; font-weight: 600; color: var(--dim); white-space: nowrap;
+}
+.pie-tag b { color: var(--text); font-weight: 800; }
+.pie-tag-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pie-leader { stroke: var(--border); stroke-width: 1.5; }
+.bucket-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+.bucket-card {
+  display: flex; align-items: center; gap: 14px; padding: 15px 16px; border-radius: 16px;
+  background: var(--bg2); border: 1px solid var(--border); cursor: pointer; transition: transform .12s, background .15s;
+}
+.bucket-card:active { transform: scale(0.98); background: var(--bg3); }
+.bucket-dot { width: 42px; height: 42px; border-radius: 13px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.bucket-dot svg { width: 20px; height: 20px; }
+.bucket-info { flex: 1; min-width: 0; }
+.bucket-name-row { display: flex; align-items: center; gap: 8px; }
+.bucket-name { font-weight: 700; font-size: 0.92rem; }
+.bucket-pct { font-size: 0.68rem; color: var(--dim); font-weight: 600; background: var(--bg3); padding: 2px 7px; border-radius: 20px; }
+.bucket-balance { font-size: 1.15rem; font-weight: 800; margin-top: 2px; }
+.bucket-goal-bar { height: 5px; border-radius: 3px; background: var(--bg4); margin-top: 8px; overflow: hidden; }
+.bucket-goal-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+.bucket-goal-txt { font-size: 0.65rem; color: var(--dim); margin-top: 4px; }
+.chev { color: var(--dim); flex-shrink: 0; }
+.recur-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.due-hint { padding: 0 20px 4px; font-size: 0.78rem; color: var(--dim); }
+
+/* ── ADD ── */
+.add-top { padding: 22px 20px 10px; flex-shrink: 0; }
+.add-title { font-size: 1.4rem; font-weight: 800; }
+.segmented { display: flex; margin: 16px 20px; background: var(--bg2); border-radius: 14px; padding: 4px; border: 1px solid var(--border); flex-shrink: 0; }
+.segmented .seg { flex: 1; text-align: center; padding: 10px 0; border-radius: 10px; font-weight: 700; font-size: 0.85rem; color: var(--dim); cursor: pointer; transition: all .15s; }
+.segmented .seg.active { background: var(--bg4); color: var(--text); }
+.form-wrap { padding: 0 20px 30px; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--dim); margin-bottom: 7px; }
+.amount-input-wrap { display: flex; align-items: center; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; }
+.amount-input-wrap .cur { font-size: 1.3rem; font-weight: 700; color: var(--dim); margin-right: 4px; }
+.amount-input-wrap input { border: none; background: transparent; outline: none; color: var(--text); font-size: 1.3rem; font-weight: 700; width: 100%; font-family: 'DM Mono', monospace; }
+input[type=text], input[type=date] {
+  width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 13px 16px;
+  color: var(--text); font-size: 1rem; font-family: inherit; outline: none;
+}
+input[type=date] { color-scheme: dark; }
+input:focus { border-color: var(--dim); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 10px 14px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border);
+  font-size: 0.82rem; font-weight: 700; color: var(--dim); cursor: pointer; transition: all .15s;
+}
+.chip.active { border-color: var(--text); color: var(--text); background: var(--bg4); }
+.chip:active { transform: scale(0.95); }
+.preview-box { margin-top: 4px; border-radius: 16px; background: var(--bg2); border: 1px solid var(--border); overflow: hidden; }
+.preview-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.preview-row:last-child { border-bottom: none; }
+.preview-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.preview-row .pname { flex: 1; font-size: 0.85rem; font-weight: 600; }
+.preview-row .pamt { font-weight: 700; font-size: 0.9rem; }
+.bucket-balance-hint { font-size: 0.78rem; color: var(--dim); margin-top: 8px; }
+.btn-primary {
+  width: 100%; padding: 15px; border-radius: 16px; border: none; background: var(--text); color: var(--bg);
+  font-weight: 800; font-size: 0.95rem; cursor: pointer; margin-top: 6px; transition: transform .12s, opacity .15s; font-family: inherit;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.4; }
+.btn-danger { background: transparent; color: var(--text); border: 1.5px solid var(--text); }
+
+/* ── HISTORY ── */
+.history-top { padding: 22px 20px 12px; flex-shrink: 0; }
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 14px; flex-shrink: 0; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-chip { flex-shrink: 0; padding: 8px 14px; border-radius: 20px; background: var(--bg2); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; color: var(--dim); cursor: pointer; white-space: nowrap; transition: transform .12s; }
+.filter-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.filter-chip:active { transform: scale(0.95); }
+.hist-list { padding: 0 20px 30px; display: flex; flex-direction: column; gap: 10px; }
+.date-heading { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dim); margin: 10px 0 2px; }
+.hist-item { display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); cursor: pointer; }
+.hist-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.hist-icon svg { width: 18px; height: 18px; }
+.hist-info { flex: 1; min-width: 0; }
+.hist-title { font-weight: 700; font-size: 0.88rem; }
+.hist-sub { font-size: 0.72rem; color: var(--dim); margin-top: 1px; }
+.hist-amt { font-weight: 800; font-size: 0.92rem; }
+.empty-state { text-align: center; padding: 60px 30px; color: var(--dim); }
+.empty-state svg { width: 40px; height: 40px; margin-bottom: 10px; opacity: 0.5; }
+.empty-state p { font-size: 0.85rem; }
+
+/* ── SETTINGS ── */
+.settings-top { padding: 22px 20px 10px; flex-shrink: 0; }
+.settings-list { padding: 10px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.settings-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; }
+.settings-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.settings-dot { width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.settings-dot svg { width: 15px; height: 15px; }
+.settings-card input[type=text] { padding: 9px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
+.settings-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.settings-row label { font-size: 0.72rem; color: var(--dim); font-weight: 600; width: 62px; flex-shrink: 0; }
+.settings-row input[type=number] { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-weight: 600; font-size: 1rem; outline: none; text-align: center; }
+.stepper-row { display: flex; align-items: center; gap: 8px; flex: 1; }
+.stepper-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--text); cursor: pointer; flex-shrink: 0; user-select: none; transition: transform .1s; }
+.stepper-btn:active { transform: scale(0.9); }
+.icon-del-btn { width: 32px; height: 32px; border-radius: 10px; background: var(--bg3); display: flex; align-items: center; justify-content: center; color: var(--dim); flex-shrink: 0; cursor: pointer; }
+.icon-del-btn svg { width: 16px; height: 16px; }
+.toggle-switch { width: 42px; height: 25px; border-radius: 13px; background: var(--bg4); border: 1px solid var(--border); position: relative; cursor: pointer; flex-shrink: 0; transition: background .2s; }
+.toggle-switch.on { background: var(--text); border-color: var(--text); }
+.toggle-switch-knob { width: 17px; height: 17px; border-radius: 50%; background: var(--dim); position: absolute; top: 3px; left: 3px; transition: transform .2s, background .2s; }
+.toggle-switch.on .toggle-switch-knob { transform: translateX(17px); background: var(--bg); }
+.toggle-hint { font-size: 0.72rem; color: var(--dim); line-height: 1.3; }
+.settings-card input[type=text][data-field="name"] { flex: 1; margin-bottom: 0; }
+.pct-sum-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 700; margin-bottom: 12px; }
+.pct-sum-bar .pct-sum-label { display: flex; align-items: center; gap: 8px; }
+.pct-sum-bar .pct-sum-label svg { width: 16px; height: 16px; flex-shrink: 0; }
+.pct-sum-bar.ok { color: var(--text); border-color: var(--text); }
+.pct-sum-bar.bad { color: var(--dim); border-style: dashed; }
+.add-bucket-btn { margin-bottom: 4px; }
+.danger-zone { margin-top: 8px; padding-top: 14px; border-top: 1px dashed var(--border); }
+
+/* ── MODAL / SHEET ── */
+.overlay { position: fixed; inset: 0; background: oklch(0% 0 0 / 0.55); z-index: 50; display: none; align-items: flex-end; }
+.overlay.open { display: flex; }
+.sheet {
+  width: 100%; max-height: 86vh; overflow-y: auto; background: var(--bg2); border-radius: 24px 24px 0 0;
+  border: 1px solid var(--border); border-bottom: none; padding: 8px 20px calc(24px + var(--safe-bottom));
+  animation: slideUp .22s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet-handle { width: 36px; height: 4px; border-radius: 3px; background: var(--border); margin: 8px auto 14px; touch-action: none; cursor: grab; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; touch-action: none; cursor: grab; }
+.sheet-head h3 { font-size: 1.15rem; font-weight: 800; }
+.sheet-close { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--dim); }
+.detail-balance { text-align: center; padding: 10px 0 18px; }
+.detail-balance .n { font-size: 2.1rem; font-weight: 800; }
+.detail-balance .l { font-size: 0.75rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+.goal-edit-row { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
+.goal-edit-row input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px;
+  color: var(--text); font-size: 1rem; font-family: 'DM Mono', monospace; font-weight: 600; outline: none;
+}
+.mini-hist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.confirm-text { font-size: 0.92rem; color: var(--dim); margin-bottom: 18px; line-height: 1.5; }
+.btn-row { display: flex; gap: 10px; }
+.btn-row .btn-primary { margin-top: 0; }
+.btn-ghost { background: var(--bg3); color: var(--text); }
+
+/* ── PROFILE ── */
+.profile-avatar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar-lg { width: 56px; height: 56px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; flex-shrink: 0; }
+.avatar-lg svg { width: 24px; height: 24px; color: var(--dim); }
+.profile-menu { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.profile-menu-item { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+.profile-menu-item svg { width: 18px; height: 18px; color: var(--dim); flex-shrink: 0; }
+.profile-menu-item .chev { margin-left: auto; }
+.about-box { padding: 14px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); }
+.about-name { font-weight: 800; font-size: 0.95rem; }
+.about-desc { font-size: 0.78rem; color: var(--dim); margin-top: 4px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div class="screen active" id="screen-home">
+    <div class="home-top">
+      <div class="home-top-row">
+        <div>
+          <div class="home-eyebrow" id="home-date"></div>
+          <div class="home-greeting" id="home-greeting"></div>
+        </div>
+        <div class="avatar-btn" id="avatar-btn" data-i18n-aria="open_profile" role="button"><span id="avatar-initial"></span></div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-label" data-i18n="available_to_spend">Available to Spend</div>
+      <div class="summary-total mono" id="summary-available">$0</div>
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg><span data-i18n="income">Income</span></div>
+          <div class="val pos mono" id="summary-income">$0</div>
+        </div>
+        <div class="summary-stat" id="spent-stat-btn" role="button" tabindex="0" data-i18n-aria="spending_breakdown_aria">
+          <div class="lbl" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg><span data-i18n="spent">Spent</span></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+          <div class="val neg mono" id="summary-spent">$0</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-title" id="due-title" data-i18n="due_now" style="display:none">Due Now</div>
+    <div class="bucket-list" id="due-list" style="display:none"></div>
+    <div class="section-title" data-i18n="allocation">Allocation</div>
+    <div class="pie-card">
+      <div class="pie-chart-wrap">
+        <svg viewBox="0 0 340 300" id="pie-svg">
+          <circle cx="170" cy="150" r="60" fill="none" stroke="var(--bg4)" stroke-width="26"></circle>
+          <g id="pie-arcs" transform="rotate(-90 170 150)"></g>
+          <g id="pie-leaders"></g>
+        </svg>
+        <div class="pie-center">
+          <div class="pie-center-amt mono" id="pie-center-amt">$0</div>
+          <div class="pie-center-lbl" data-i18n="total">Total</div>
+        </div>
+        <div id="pie-tags"></div>
+      </div>
+    </div>
+
+    <div class="section-title" data-i18n="your_buckets">Your Buckets</div>
+    <div class="bucket-list" id="bucket-list"></div>
+  </div>
+
+  <!-- ADD -->
+  <div class="screen" id="screen-add">
+    <div class="add-top"><div class="add-title" data-i18n="nav_add">Add</div></div>
+    <div class="segmented">
+      <div class="seg active" data-seg="income" data-i18n="income">Income</div>
+      <div class="seg" data-seg="expense" data-i18n="seg_expense">Expense</div>
+      <div class="seg" data-seg="recurring" data-i18n="seg_recurring">Recurring</div>
+    </div>
+    <div class="form-wrap" id="form-income">
+      <div class="field">
+        <label data-i18n="amount">Amount</label>
+        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="inc-amount"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="source">Source</label>
+        <input type="text" id="inc-source" placeholder="e.g. Paycheck" data-i18n-placeholder="source_placeholder">
+      </div>
+      <div class="field">
+        <label data-i18n="date">Date</label>
+        <input type="date" id="inc-date">
+      </div>
+      <div class="field">
+        <label data-i18n="split_preview">Split Preview</label>
+        <div class="preview-box" id="inc-preview"></div>
+      </div>
+      <button class="btn-primary" id="inc-submit" data-i18n="add_income_btn">Add Income</button>
+    </div>
+    <div class="form-wrap" id="form-expense" style="display:none">
+      <div class="field">
+        <label data-i18n="bucket">Bucket</label>
+        <div class="chip-row" id="exp-buckets"></div>
+        <div class="bucket-balance-hint" id="exp-balance-hint"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="amount">Amount</label>
+        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="exp-amount"></div>
+      </div>
+      <div class="field">
+        <label data-i18n="note">Note</label>
+        <input type="text" id="exp-note" placeholder="e.g. Groceries" data-i18n-placeholder="note_placeholder">
+      </div>
+      <div class="field">
+        <label data-i18n="date">Date</label>
+        <input type="date" id="exp-date">
+      </div>
+      <button class="btn-primary" id="exp-submit" data-i18n="log_expense_btn">Log Expense</button>
+    </div>
+    <div class="form-wrap" id="form-recurring" style="display:none">
+      <div id="recurring-list"></div>
+      <button class="btn-primary btn-ghost" id="add-recurring-btn" style="margin-top:12px" data-i18n="add_recurring_btn">+ Add Recurring</button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="screen" id="screen-history">
+    <div class="history-top"><div class="add-title" data-i18n="history_title">History</div></div>
+    <div class="filter-row" id="filter-row"></div>
+    <div class="hist-list" id="hist-list"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="screen" id="screen-settings">
+    <div class="settings-top"><div class="add-title" data-i18n="settings_title">Settings</div></div>
+    <div class="settings-list" id="settings-list"></div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab active" data-tab="home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span data-i18n="nav_home">Home</span>
+    </div>
+    <div class="tab" data-tab="add">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      <span data-i18n="nav_add">Add</span>
+    </div>
+    <div class="tab" data-tab="history">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span data-i18n="nav_history">History</span>
+    </div>
+    <div class="tab" data-tab="settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
+      <span data-i18n="nav_settings">Settings</span>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+
+<script>
+const ICONS = {
+  target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+  close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>',
+  chev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>',
+  empty: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+  trendUp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+  flag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>',
+  award: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+  star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+  compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+  gift: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
+  briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
+  anchor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>'
+};
+
+const COLORS = {
+  gold:    { solid: 'var(--gold)',    dim: 'var(--gold-d)' },
+  rose:    { solid: 'var(--rose)',    dim: 'var(--rose-d)' },
+  orange:  { solid: 'var(--orange)',  dim: 'var(--orange-d)' },
+  sky:     { solid: 'var(--sky)',     dim: 'var(--sky-d)' },
+  emerald: { solid: 'var(--emerald)', dim: 'var(--emerald-d)' },
+  violet:  { solid: 'var(--violet)',  dim: 'var(--violet-d)' },
+  cyan:    { solid: 'var(--cyan)',    dim: 'var(--cyan-d)' },
+  amber:   { solid: 'var(--amber)',   dim: 'var(--amber-d)' },
+  pink:    { solid: 'var(--pink)',    dim: 'var(--pink-d)' },
+  lime:    { solid: 'var(--lime)',    dim: 'var(--lime-d)' },
+};
+const COLOR_PALETTE = Object.keys(COLORS);
+const ICON_PALETTE = ['home', 'heart', 'trendUp', 'flag', 'award', 'star', 'compass', 'gift', 'briefcase', 'anchor'];
+
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português' },
+  { code: 'ko', label: '한국어' },
+  { code: 'ja', label: '日本語' },
+];
+const LOCALE_MAP = { en: 'en-US', es: 'es-ES', pt: 'pt-BR', ko: 'ko-KR', ja: 'ja-JP' };
+
+const I18N = {
+en: {
+  nav_home: 'Home', nav_add: 'Add', nav_history: 'History', nav_settings: 'Settings',
+  greeting_morning: 'Good morning', greeting_afternoon: 'Good afternoon', greeting_evening: 'Good evening',
+  open_profile: 'Open profile', available_to_spend: 'Available to Spend', income: 'Income', spent: 'Spent',
+  spending_breakdown_aria: 'View spending breakdown by category', due_now: 'Due Now', log: 'Log',
+  allocation: 'Allocation', total: 'Total', your_buckets: 'Your Buckets',
+  counted_as_spent: 'Counted as spent when added', goal_progress: '{bal} of {goal} goal',
+  delete_name_aria: 'Delete {name}',
+  seg_expense: 'Expense', seg_recurring: 'Recurring', amount: 'Amount', source: 'Source',
+  source_placeholder: 'e.g. Paycheck', date: 'Date', split_preview: 'Split Preview',
+  add_income_btn: 'Add Income', bucket: 'Bucket', note: 'Note', note_placeholder: 'e.g. Groceries',
+  log_expense_btn: 'Log Expense', available_colon: 'Available: {amt}', spent_tag: 'spent',
+  no_recurring_title: 'No recurring payments yet.',
+  no_recurring_sub: "Add a bill or subscription to get reminded when it's due.",
+  add_recurring_btn: '+ Add Recurring', freq_weekly: 'Weekly', freq_biweekly: 'Biweekly',
+  freq_monthly: 'Monthly', freq_yearly: 'Yearly', add_recurring_title: 'Add Recurring', name: 'Name',
+  name_placeholder: 'e.g. Netflix', repeats: 'Repeats', starting: 'Starting', due_now_short: 'Due now',
+  next_date: 'Next {date}', unknown_bucket: 'Unknown bucket', delete_name_q: 'Delete "{name}"?',
+  delete_recurring_text: 'This stops the reminder. Past transactions already logged from it stay in History.',
+  cancel: 'Cancel', delete: 'Delete', recurring_payment_default: 'Recurring Payment',
+  log_recur_aria: 'Log {name} now',
+  history_title: 'History', all: 'All', no_transactions_title: 'No transactions yet.',
+  no_transactions_sub: 'Add income or an expense to get started.', split_across: 'Split across {n} buckets',
+  settings_title: 'Settings', percent: 'Percent', goal: 'Goal', no_goal: 'No goal',
+  counts_toward_spent: 'Counts toward Spent when added', add_bucket_btn: '+ Add Bucket',
+  total_allocation: 'Total Allocation', save_changes: 'Save Changes', new_bucket_default: 'New Bucket',
+  decrease_percent_aria: 'Decrease {name} percent', increase_percent_aria: 'Increase {name} percent',
+  count_as_spent_aria: 'Count {name} as spent when added',
+  delete_bucket_text1: 'This removes the bucket and its percentage allocation.',
+  delete_bucket_holds: ' It currently holds {amt}, which will be permanently removed.',
+  delete_bucket_text2: ' Past transactions logged to it stay in History but will show as unassigned.',
+  of_every_deposit: '{pct}% of every deposit', counted_as_spent_suffix: ' · Counted as spent',
+  set_goal_placeholder: 'Set a goal amount', save: 'Save', recent_activity: 'Recent Activity',
+  no_activity_yet: 'No activity yet',
+  delete_entry_title: 'Delete Entry?',
+  delete_entry_text: 'This will remove the {desc} and reverse its effect on your bucket balances.',
+  income_of_from: 'income of {amt} from "{source}"', expense_of: 'expense of {amt} ("{note}")',
+  reset_title: 'Reset All Data?',
+  reset_text: 'This permanently deletes every bucket balance and transaction, and restores the default 55/5/10/15/15 split. This cannot be undone.',
+  reset: 'Reset',
+  profile_title: 'Profile', your_name: 'Your Name', add_your_name_placeholder: 'Add your name',
+  app_section: 'App', export_data: 'Export Data', import_data: 'Import Data', about_section: 'About',
+  app_desc: 'Splits every paycheck into buckets by percentage and tracks balances, goals, and spending against them.',
+  reset_all_data_btn: 'Reset All Data', couldnt_import_title: "Couldn't Import",
+  couldnt_import_text: "That file doesn't look like a valid Wealth Split backup.", ok: 'OK',
+  language_section: 'Language',
+  spending_breakdown_title: 'Spending Breakdown', total_spent: 'Total Spent', by_category: 'By Category',
+  recent_spending: 'Recent Spending', nothing_spent_yet: 'Nothing spent yet', close_aria: 'Close',
+},
+es: {
+  nav_home: 'Inicio', nav_add: 'Añadir', nav_history: 'Historial', nav_settings: 'Ajustes',
+  greeting_morning: 'Buenos días', greeting_afternoon: 'Buenas tardes', greeting_evening: 'Buenas noches',
+  open_profile: 'Abrir perfil', available_to_spend: 'Disponible para gastar', income: 'Ingresos', spent: 'Gastado',
+  spending_breakdown_aria: 'Ver desglose de gastos por categoría', due_now: 'Vence ahora', log: 'Registrar',
+  allocation: 'Distribución', total: 'Total', your_buckets: 'Tus categorías',
+  counted_as_spent: 'Se cuenta como gastado al añadirse', goal_progress: '{bal} de {goal} de meta',
+  delete_name_aria: 'Eliminar {name}',
+  seg_expense: 'Gasto', seg_recurring: 'Recurrente', amount: 'Monto', source: 'Origen',
+  source_placeholder: 'p. ej. Sueldo', date: 'Fecha', split_preview: 'Vista previa del reparto',
+  add_income_btn: 'Añadir ingreso', bucket: 'Categoría', note: 'Nota', note_placeholder: 'p. ej. Supermercado',
+  log_expense_btn: 'Registrar gasto', available_colon: 'Disponible: {amt}', spent_tag: 'gastado',
+  no_recurring_title: 'Aún no hay pagos recurrentes.',
+  no_recurring_sub: 'Añade una factura o suscripción para recibir recordatorios cuando venza.',
+  add_recurring_btn: '+ Añadir recurrente', freq_weekly: 'Semanal', freq_biweekly: 'Quincenal',
+  freq_monthly: 'Mensual', freq_yearly: 'Anual', add_recurring_title: 'Añadir recurrente', name: 'Nombre',
+  name_placeholder: 'p. ej. Netflix', repeats: 'Se repite', starting: 'Comienza', due_now_short: 'Vence ahora',
+  next_date: 'Próximo {date}', unknown_bucket: 'Categoría desconocida', delete_name_q: '¿Eliminar "{name}"?',
+  delete_recurring_text: 'Esto detiene el recordatorio. Las transacciones ya registradas se mantienen en el Historial.',
+  cancel: 'Cancelar', delete: 'Eliminar', recurring_payment_default: 'Pago recurrente',
+  log_recur_aria: 'Registrar {name} ahora',
+  history_title: 'Historial', all: 'Todo', no_transactions_title: 'Aún no hay transacciones.',
+  no_transactions_sub: 'Añade un ingreso o un gasto para empezar.', split_across: 'Repartido entre {n} categorías',
+  settings_title: 'Ajustes', percent: 'Porcentaje', goal: 'Meta', no_goal: 'Sin meta',
+  counts_toward_spent: 'Cuenta como gastado al añadirse', add_bucket_btn: '+ Añadir categoría',
+  total_allocation: 'Distribución total', save_changes: 'Guardar cambios', new_bucket_default: 'Nueva categoría',
+  decrease_percent_aria: 'Disminuir el porcentaje de {name}', increase_percent_aria: 'Aumentar el porcentaje de {name}',
+  count_as_spent_aria: 'Contar {name} como gastado al añadirse',
+  delete_bucket_text1: 'Esto elimina la categoría y su porcentaje asignado.',
+  delete_bucket_holds: ' Actualmente tiene {amt}, que se eliminará de forma permanente.',
+  delete_bucket_text2: ' Las transacciones ya registradas en ella permanecerán en el Historial, mostradas como sin asignar.',
+  of_every_deposit: '{pct}% de cada depósito', counted_as_spent_suffix: ' · Contado como gastado',
+  set_goal_placeholder: 'Define un monto de meta', save: 'Guardar', recent_activity: 'Actividad reciente',
+  no_activity_yet: 'Aún no hay actividad',
+  delete_entry_title: '¿Eliminar entrada?',
+  delete_entry_text: 'Esto eliminará {desc} y revertirá su efecto en los saldos de tus categorías.',
+  income_of_from: 'el ingreso de {amt} de "{source}"', expense_of: 'el gasto de {amt} ("{note}")',
+  reset_title: '¿Restablecer todos los datos?',
+  reset_text: 'Esto elimina permanentemente cada saldo y transacción, y restaura el reparto predeterminado 55/5/10/15/15. Esta acción no se puede deshacer.',
+  reset: 'Restablecer',
+  profile_title: 'Perfil', your_name: 'Tu nombre', add_your_name_placeholder: 'Añade tu nombre',
+  app_section: 'Aplicación', export_data: 'Exportar datos', import_data: 'Importar datos', about_section: 'Acerca de',
+  app_desc: 'Reparte cada sueldo en categorías por porcentaje y hace seguimiento de saldos, metas y gastos.',
+  reset_all_data_btn: 'Restablecer todos los datos', couldnt_import_title: 'No se pudo importar',
+  couldnt_import_text: 'Ese archivo no parece ser una copia de seguridad válida de Wealth Split.', ok: 'Aceptar',
+  language_section: 'Idioma',
+  spending_breakdown_title: 'Desglose de gastos', total_spent: 'Total gastado', by_category: 'Por categoría',
+  recent_spending: 'Gastos recientes', nothing_spent_yet: 'Aún no se ha gastado nada', close_aria: 'Cerrar',
+},
+pt: {
+  nav_home: 'Início', nav_add: 'Adicionar', nav_history: 'Histórico', nav_settings: 'Ajustes',
+  greeting_morning: 'Bom dia', greeting_afternoon: 'Boa tarde', greeting_evening: 'Boa noite',
+  open_profile: 'Abrir perfil', available_to_spend: 'Disponível para gastar', income: 'Renda', spent: 'Gasto',
+  spending_breakdown_aria: 'Ver detalhamento de gastos por categoria', due_now: 'Vencendo agora', log: 'Registrar',
+  allocation: 'Distribuição', total: 'Total', your_buckets: 'Suas categorias',
+  counted_as_spent: 'Contado como gasto ao ser adicionado', goal_progress: '{bal} de {goal} da meta',
+  delete_name_aria: 'Excluir {name}',
+  seg_expense: 'Gasto', seg_recurring: 'Recorrente', amount: 'Valor', source: 'Origem',
+  source_placeholder: 'ex.: Salário', date: 'Data', split_preview: 'Prévia da divisão',
+  add_income_btn: 'Adicionar renda', bucket: 'Categoria', note: 'Nota', note_placeholder: 'ex.: Mercado',
+  log_expense_btn: 'Registrar gasto', available_colon: 'Disponível: {amt}', spent_tag: 'gasto',
+  no_recurring_title: 'Ainda não há pagamentos recorrentes.',
+  no_recurring_sub: 'Adicione uma conta ou assinatura para ser lembrado quando ela vencer.',
+  add_recurring_btn: '+ Adicionar recorrente', freq_weekly: 'Semanal', freq_biweekly: 'Quinzenal',
+  freq_monthly: 'Mensal', freq_yearly: 'Anual', add_recurring_title: 'Adicionar recorrente', name: 'Nome',
+  name_placeholder: 'ex.: Netflix', repeats: 'Repete', starting: 'Início', due_now_short: 'Vence agora',
+  next_date: 'Próximo {date}', unknown_bucket: 'Categoria desconhecida', delete_name_q: 'Excluir "{name}"?',
+  delete_recurring_text: 'Isso interrompe o lembrete. As transações já registradas permanecem no Histórico.',
+  cancel: 'Cancelar', delete: 'Excluir', recurring_payment_default: 'Pagamento recorrente',
+  log_recur_aria: 'Registrar {name} agora',
+  history_title: 'Histórico', all: 'Tudo', no_transactions_title: 'Ainda não há transações.',
+  no_transactions_sub: 'Adicione uma renda ou um gasto para começar.', split_across: 'Dividido entre {n} categorias',
+  settings_title: 'Ajustes', percent: 'Porcentagem', goal: 'Meta', no_goal: 'Sem meta',
+  counts_toward_spent: 'Conta como gasto ao ser adicionado', add_bucket_btn: '+ Adicionar categoria',
+  total_allocation: 'Distribuição total', save_changes: 'Salvar alterações', new_bucket_default: 'Nova categoria',
+  decrease_percent_aria: 'Diminuir a porcentagem de {name}', increase_percent_aria: 'Aumentar a porcentagem de {name}',
+  count_as_spent_aria: 'Contar {name} como gasto ao ser adicionado',
+  delete_bucket_text1: 'Isso remove a categoria e sua porcentagem alocada.',
+  delete_bucket_holds: ' Ela contém atualmente {amt}, que será removido permanentemente.',
+  delete_bucket_text2: ' As transações já registradas nela permanecerão no Histórico, exibidas como não atribuídas.',
+  of_every_deposit: '{pct}% de cada depósito', counted_as_spent_suffix: ' · Contado como gasto',
+  set_goal_placeholder: 'Defina um valor de meta', save: 'Salvar', recent_activity: 'Atividade recente',
+  no_activity_yet: 'Ainda não há atividade',
+  delete_entry_title: 'Excluir lançamento?',
+  delete_entry_text: 'Isso removerá {desc} e reverterá seu efeito nos saldos das suas categorias.',
+  income_of_from: 'a renda de {amt} de "{source}"', expense_of: 'o gasto de {amt} ("{note}")',
+  reset_title: 'Redefinir todos os dados?',
+  reset_text: 'Isso exclui permanentemente todos os saldos e transações, e restaura a divisão padrão de 55/5/10/15/15. Esta ação não pode ser desfeita.',
+  reset: 'Redefinir',
+  profile_title: 'Perfil', your_name: 'Seu nome', add_your_name_placeholder: 'Adicione seu nome',
+  app_section: 'Aplicativo', export_data: 'Exportar dados', import_data: 'Importar dados', about_section: 'Sobre',
+  app_desc: 'Divide cada salário em categorias por porcentagem e acompanha saldos, metas e gastos.',
+  reset_all_data_btn: 'Redefinir todos os dados', couldnt_import_title: 'Não foi possível importar',
+  couldnt_import_text: 'Esse arquivo não parece ser um backup válido do Wealth Split.', ok: 'OK',
+  language_section: 'Idioma',
+  spending_breakdown_title: 'Detalhamento de gastos', total_spent: 'Total gasto', by_category: 'Por categoria',
+  recent_spending: 'Gastos recentes', nothing_spent_yet: 'Ainda não há gastos', close_aria: 'Fechar',
+},
+ko: {
+  nav_home: '홈', nav_add: '추가', nav_history: '내역', nav_settings: '설정',
+  greeting_morning: '좋은 아침이에요', greeting_afternoon: '좋은 오후예요', greeting_evening: '좋은 저녁이에요',
+  open_profile: '프로필 열기', available_to_spend: '사용 가능 금액', income: '수입', spent: '지출',
+  spending_breakdown_aria: '카테고리별 지출 내역 보기', due_now: '지금 결제 예정', log: '기록',
+  allocation: '배분', total: '총액', your_buckets: '내 카테고리',
+  counted_as_spent: '추가 시 지출로 계산됨', goal_progress: '{goal} 목표 중 {bal}',
+  delete_name_aria: '{name} 삭제',
+  seg_expense: '지출', seg_recurring: '정기 결제', amount: '금액', source: '출처',
+  source_placeholder: '예: 월급', date: '날짜', split_preview: '배분 미리보기',
+  add_income_btn: '수입 추가', bucket: '카테고리', note: '메모', note_placeholder: '예: 장보기',
+  log_expense_btn: '지출 기록', available_colon: '사용 가능: {amt}', spent_tag: '지출',
+  no_recurring_title: '아직 정기 결제가 없어요.',
+  no_recurring_sub: '청구서나 구독을 추가하면 결제일에 알려드려요.',
+  add_recurring_btn: '+ 정기 결제 추가', freq_weekly: '매주', freq_biweekly: '격주',
+  freq_monthly: '매월', freq_yearly: '매년', add_recurring_title: '정기 결제 추가', name: '이름',
+  name_placeholder: '예: 넷플릭스', repeats: '반복 주기', starting: '시작일', due_now_short: '지금 결제 예정',
+  next_date: '다음 {date}', unknown_bucket: '알 수 없는 카테고리', delete_name_q: '"{name}"을(를) 삭제할까요?',
+  delete_recurring_text: '알림이 중지됩니다. 이미 기록된 거래 내역은 내역 화면에 그대로 남아요.',
+  cancel: '취소', delete: '삭제', recurring_payment_default: '정기 결제',
+  log_recur_aria: '{name} 지금 기록',
+  history_title: '내역', all: '전체', no_transactions_title: '아직 거래 내역이 없어요.',
+  no_transactions_sub: '수입이나 지출을 추가해 시작해 보세요.', split_across: '{n}개 카테고리로 배분됨',
+  settings_title: '설정', percent: '비율', goal: '목표', no_goal: '목표 없음',
+  counts_toward_spent: '추가 시 지출로 계산됨', add_bucket_btn: '+ 카테고리 추가',
+  total_allocation: '총 배분 비율', save_changes: '변경 사항 저장', new_bucket_default: '새 카테고리',
+  decrease_percent_aria: '{name} 비율 줄이기', increase_percent_aria: '{name} 비율 늘리기',
+  count_as_spent_aria: '{name}을(를) 추가 시 지출로 계산',
+  delete_bucket_text1: '이 카테고리와 배분된 비율이 삭제됩니다.',
+  delete_bucket_holds: ' 현재 {amt}이(가) 들어 있으며, 영구적으로 삭제됩니다.',
+  delete_bucket_text2: ' 이미 기록된 거래 내역은 내역 화면에 남지만 미지정으로 표시됩니다.',
+  of_every_deposit: '입금액의 {pct}%', counted_as_spent_suffix: ' · 지출로 계산됨',
+  set_goal_placeholder: '목표 금액 설정', save: '저장', recent_activity: '최근 활동',
+  no_activity_yet: '아직 활동이 없어요',
+  delete_entry_title: '항목을 삭제할까요?',
+  delete_entry_text: '{desc}이(가) 삭제되고 카테고리 잔액에 반영된 내용이 취소됩니다.',
+  income_of_from: '"{source}"에서 온 {amt} 수입', expense_of: '{amt} 지출 ("{note}")',
+  reset_title: '모든 데이터를 초기화할까요?',
+  reset_text: '모든 카테고리 잔액과 거래 내역이 영구적으로 삭제되고 기본 55/5/10/15/15 배분으로 복원됩니다. 이 작업은 되돌릴 수 없습니다.',
+  reset: '초기화',
+  profile_title: '프로필', your_name: '이름', add_your_name_placeholder: '이름을 입력하세요',
+  app_section: '앱', export_data: '데이터 내보내기', import_data: '데이터 가져오기', about_section: '정보',
+  app_desc: '월급을 비율에 따라 카테고리로 나누고 잔액, 목표, 지출을 추적해요.',
+  reset_all_data_btn: '모든 데이터 초기화', couldnt_import_title: '가져오기 실패',
+  couldnt_import_text: '올바른 Wealth Split 백업 파일이 아닌 것 같아요.', ok: '확인',
+  language_section: '언어',
+  spending_breakdown_title: '지출 내역', total_spent: '총 지출', by_category: '카테고리별',
+  recent_spending: '최근 지출', nothing_spent_yet: '아직 지출 내역이 없어요', close_aria: '닫기',
+},
+ja: {
+  nav_home: 'ホーム', nav_add: '追加', nav_history: '履歴', nav_settings: '設定',
+  greeting_morning: 'おはようございます', greeting_afternoon: 'こんにちは', greeting_evening: 'こんばんは',
+  open_profile: 'プロフィールを開く', available_to_spend: '使える金額', income: '収入', spent: '支出',
+  spending_breakdown_aria: 'カテゴリ別の支出内訳を見る', due_now: '支払い期限', log: '記録',
+  allocation: '配分', total: '合計', your_buckets: 'カテゴリ一覧',
+  counted_as_spent: '追加時に支出として計上', goal_progress: '目標{goal}のうち{bal}',
+  delete_name_aria: '{name}を削除',
+  seg_expense: '支出', seg_recurring: '定期支払い', amount: '金額', source: '収入元',
+  source_placeholder: '例: 給料', date: '日付', split_preview: '配分プレビュー',
+  add_income_btn: '収入を追加', bucket: 'カテゴリ', note: 'メモ', note_placeholder: '例: 食料品',
+  log_expense_btn: '支出を記録', available_colon: '使える金額: {amt}', spent_tag: '支出',
+  no_recurring_title: 'まだ定期支払いがありません。',
+  no_recurring_sub: '請求書やサブスクを追加すると、期限をお知らせします。',
+  add_recurring_btn: '+ 定期支払いを追加', freq_weekly: '毎週', freq_biweekly: '隔週',
+  freq_monthly: '毎月', freq_yearly: '毎年', add_recurring_title: '定期支払いを追加', name: '名前',
+  name_placeholder: '例: Netflix', repeats: '繰り返し', starting: '開始日', due_now_short: '期限が来ています',
+  next_date: '次回 {date}', unknown_bucket: '不明なカテゴリ', delete_name_q: '"{name}"を削除しますか?',
+  delete_recurring_text: 'リマインダーが停止されます。すでに記録された取引は履歴に残ります。',
+  cancel: 'キャンセル', delete: '削除', recurring_payment_default: '定期支払い',
+  log_recur_aria: '{name}を今すぐ記録',
+  history_title: '履歴', all: 'すべて', no_transactions_title: 'まだ取引がありません。',
+  no_transactions_sub: '収入または支出を追加して始めましょう。', split_across: '{n}個のカテゴリに配分',
+  settings_title: '設定', percent: '割合', goal: '目標', no_goal: '目標なし',
+  counts_toward_spent: '追加時に支出として計上', add_bucket_btn: '+ カテゴリを追加',
+  total_allocation: '配分合計', save_changes: '変更を保存', new_bucket_default: '新しいカテゴリ',
+  decrease_percent_aria: '{name}の割合を減らす', increase_percent_aria: '{name}の割合を増やす',
+  count_as_spent_aria: '{name}を追加時に支出として計上',
+  delete_bucket_text1: 'このカテゴリとその配分割合が削除されます。',
+  delete_bucket_holds: ' 現在{amt}が入っており、完全に削除されます。',
+  delete_bucket_text2: ' すでに記録された取引は履歴に残りますが、未割り当てと表示されます。',
+  of_every_deposit: '入金額の{pct}%', counted_as_spent_suffix: ' ・支出として計上済み',
+  set_goal_placeholder: '目標金額を設定', save: '保存', recent_activity: '最近のアクティビティ',
+  no_activity_yet: 'まだアクティビティがありません',
+  delete_entry_title: 'この項目を削除しますか?',
+  delete_entry_text: '{desc}が削除され、カテゴリ残高への影響が取り消されます。',
+  income_of_from: '"{source}"からの収入 {amt}', expense_of: '支出 {amt}(「{note}」)',
+  reset_title: 'すべてのデータをリセットしますか?',
+  reset_text: 'すべてのカテゴリ残高と取引が完全に削除され、デフォルトの55/5/10/15/15配分に戻ります。この操作は取り消せません。',
+  reset: 'リセット',
+  profile_title: 'プロフィール', your_name: 'お名前', add_your_name_placeholder: 'お名前を入力',
+  app_section: 'アプリ', export_data: 'データをエクスポート', import_data: 'データをインポート', about_section: 'アプリについて',
+  app_desc: '毎回の給料を割合ごとにカテゴリへ配分し、残高・目標・支出を記録します。',
+  reset_all_data_btn: 'すべてのデータをリセット', couldnt_import_title: 'インポートできませんでした',
+  couldnt_import_text: 'このファイルは有効なWealth Splitのバックアップではないようです。', ok: 'OK',
+  language_section: '言語',
+  spending_breakdown_title: '支出の内訳', total_spent: '合計支出', by_category: 'カテゴリ別',
+  recent_spending: '最近の支出', nothing_spent_yet: 'まだ支出はありません', close_aria: '閉じる',
+},
+};
+
+function t(key, vars) {
+  const lang = (state && state.lang) || 'en';
+  let str = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  if (vars) {
+    Object.keys(vars).forEach(k => { str = str.split('{' + k + '}').join(vars[k]); });
+  }
+  return str;
+}
+
+const DEFAULT_STATE = {
+  buckets: [
+    { id: 'essentials', name: 'Essentials',       color: 'gold',    icon: 'home',    pct: 55, balance: 0, goal: null, autoSpend: false },
+    { id: 'guiltfree',  name: 'Guilt-Free',        color: 'rose',    icon: 'heart',   pct: 5,  balance: 0, goal: null, autoSpend: false },
+    { id: 'payoff',     name: 'Payoff / Invest',   color: 'orange',  icon: 'trendUp', pct: 10, balance: 0, goal: null, autoSpend: false },
+    { id: 'save',       name: 'Save Toward Goal',  color: 'sky',     icon: 'flag',    pct: 15, balance: 0, goal: null, autoSpend: true },
+    { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', icon: 'award',   pct: 15, balance: 0, goal: null, autoSpend: false },
+  ],
+  transactions: [],
+  profile: { name: '' },
+  recurring: [],
+  lang: 'en',
+};
+
+let state = load();
+let currentHistFilter = 'all';
+
+function load() {
+  try {
+    const raw = localStorage.getItem('wealthSplitData');
+    if (!raw) return structuredClone(DEFAULT_STATE);
+    const parsed = JSON.parse(raw);
+    if (!parsed.buckets || !parsed.transactions) return structuredClone(DEFAULT_STATE);
+    let migrated = false;
+    parsed.buckets.forEach((b, i) => {
+      if (!b.icon || !ICONS[b.icon]) { b.icon = ICON_PALETTE[i % ICON_PALETTE.length]; migrated = true; }
+      if (typeof b.autoSpend !== 'boolean') { b.autoSpend = (b.id === 'save'); migrated = true; }
+    });
+    if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
+    if (!parsed.recurring) { parsed.recurring = []; migrated = true; }
+    if (!parsed.lang || !LOCALE_MAP[parsed.lang]) { parsed.lang = 'en'; migrated = true; }
+    if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
+    return parsed;
+  } catch (e) { return structuredClone(DEFAULT_STATE); }
+}
+function save() {
+  try { localStorage.setItem('wealthSplitData', JSON.stringify(state)); }
+  catch (e) { console.error('Wealth Split: failed to save data', e); }
+}
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function locale() { return LOCALE_MAP[state.lang] || 'en-US'; }
+function fmt(n) { return new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD' }).format(n); }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function niceDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString(locale(), { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function bucket(id) { return state.buckets.find(b => b.id === id); }
+
+function applyI18n() {
+  document.documentElement.lang = state.lang || 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+}
+
+/* ── NAV ── */
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
+  if (name === 'home') renderHome();
+  if (name === 'add') renderAdd();
+  if (name === 'history') renderHistory();
+  if (name === 'settings') renderSettings();
+}
+
+/* ── HOME ── */
+function updateProfileUI() {
+  const name = (state.profile.name || '').trim();
+  const initial = name ? name[0].toUpperCase() : '';
+  const avatarBtn = document.getElementById('avatar-initial');
+  if (avatarBtn) avatarBtn.innerHTML = initial || ICONS.user;
+  const hour = new Date().getHours();
+  const period = t(hour < 12 ? 'greeting_morning' : hour < 18 ? 'greeting_afternoon' : 'greeting_evening');
+  const greet = document.getElementById('home-greeting');
+  if (greet) greet.textContent = name ? `${period}, ${name}` : period;
+}
+
+function calcTotalSpent() {
+  return calcSpendingItems().reduce((s, it) => s + it.amount, 0);
+}
+
+function calcSpendingItems() {
+  const items = [];
+  state.transactions.forEach(t => {
+    if (t.type === 'expense') {
+      items.push({ date: t.date, note: t.note, bucketId: t.bucketId, amount: t.amount, sortKey: t.date + t.id });
+    } else if (t.type === 'income') {
+      t.splits.forEach(sp => {
+        const b = bucket(sp.bucketId);
+        if (b && b.autoSpend && sp.amount > 0) {
+          items.push({ date: t.date, note: `${t.source} → ${b.name}`, bucketId: sp.bucketId, amount: sp.amount, sortKey: t.date + t.id + sp.bucketId });
+        }
+      });
+    }
+  });
+  items.sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+  return items;
+}
+
+function openSpendingBreakdown() {
+  const items = calcSpendingItems();
+  const total = items.reduce((s, it) => s + it.amount, 0);
+
+  const byBucket = {};
+  items.forEach(it => { byBucket[it.bucketId] = (byBucket[it.bucketId] || 0) + it.amount; });
+
+  const catRows = state.buckets
+    .map(b => ({ b, amt: byBucket[b.id] || 0 }))
+    .filter(x => x.amt > 0)
+    .sort((a, z) => z.amt - a.amt)
+    .map(({ b, amt }) => {
+      const c = COLORS[b.color];
+      const pct = total > 0 ? (amt / total) * 100 : 0;
+      return `<div class="spend-cat-row">
+        <div class="bucket-dot" style="width:34px;height:34px;border-radius:10px;background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700"><span>${b.name}</span><span class="mono">${fmt(amt)}</span></div>
+          <div class="bucket-goal-bar" style="margin-top:6px"><div class="bucket-goal-fill" style="width:${pct}%;background:${c.solid}"></div></div>
+        </div>
+      </div>`;
+    }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>${t('nothing_spent_yet')}</p></div>`;
+
+  const itemRows = items.map(it => {
+    const b = bucket(it.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    return `<div class="hist-item" style="cursor:default">
+      <div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
+      <div class="hist-info"><div class="hist-title">${it.note}</div><div class="hist-sub">${b ? b.name : t('unknown_bucket')} · ${niceDate(it.date)}</div></div>
+      <div class="hist-amt mono">${fmt(it.amount)}</div>
+    </div>`;
+  }).join('');
+
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('spending_breakdown_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="detail-balance">
+      <div class="n mono">${fmt(total)}</div>
+      <div class="l">${t('total_spent')}</div>
+    </div>
+    <div class="section-title" style="padding:0 0 6px">${t('by_category')}</div>
+    <div class="spend-cat-list">${catRows}</div>
+    ${items.length ? `<div class="section-title" style="padding:16px 0 8px">${t('recent_spending')}</div><div class="mini-hist">${itemRows}</div>` : ''}
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+}
+
+function renderHome() {
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString(locale(), { weekday: 'long', month: 'long', day: 'numeric' });
+  updateProfileUI();
+  const total = state.buckets.reduce((s, b) => s + b.balance, 0);
+  const totalIncome = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const totalSpent = calcTotalSpent();
+  document.getElementById('summary-income').textContent = fmt(totalIncome);
+  document.getElementById('summary-spent').textContent = fmt(totalSpent);
+  const available = totalIncome - totalSpent;
+  const availableEl = document.getElementById('summary-available');
+  availableEl.textContent = fmt(available);
+  availableEl.classList.toggle('neg', available < 0);
+
+  const list = document.getElementById('bucket-list');
+  list.innerHTML = '';
+  state.buckets.forEach(b => {
+    const c = COLORS[b.color];
+    const card = document.createElement('div');
+    card.className = 'bucket-card';
+    let goalHtml = '';
+    if (b.goal && b.goal > 0) {
+      const pctFill = Math.min(100, (b.balance / b.goal) * 100);
+      goalHtml = `<div class="bucket-goal-bar"><div class="bucket-goal-fill" style="width:${pctFill}%;background:${c.solid}"></div></div>
+        <div class="bucket-goal-txt">${t('goal_progress', { bal: fmt(b.balance), goal: fmt(b.goal) })}</div>`;
+    }
+    const autoSpendHtml = b.autoSpend ? `<div class="bucket-goal-txt">${t('counted_as_spent')}</div>` : '';
+    card.innerHTML = `
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
+      <div class="bucket-info">
+        <div class="bucket-name-row"><span class="bucket-name">${b.name}</span><span class="bucket-pct">${b.pct}%</span></div>
+        <div class="bucket-balance mono">${fmt(b.balance)}</div>
+        ${autoSpendHtml}
+        ${goalHtml}
+      </div>
+      <div class="chev">${ICONS.chev}</div>`;
+    card.addEventListener('click', () => openBucketDetail(b.id));
+    list.appendChild(card);
+  });
+
+  renderPieChart(total);
+  renderDueBanner();
+}
+
+function renderDueBanner() {
+  const dueTitle = document.getElementById('due-title');
+  const dueList = document.getElementById('due-list');
+  const today = todayStr();
+  const due = state.recurring.filter(r => r.nextDate <= today).sort((a, b) => a.nextDate.localeCompare(b.nextDate));
+  if (due.length === 0) {
+    dueTitle.style.display = 'none';
+    dueList.style.display = 'none';
+    return;
+  }
+  dueTitle.style.display = 'block';
+  dueList.style.display = 'flex';
+  dueList.innerHTML = '';
+  due.forEach(r => {
+    const b = bucket(r.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    const card = document.createElement('div');
+    card.className = 'bucket-card';
+    card.style.cursor = 'default';
+    card.innerHTML = `
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS.repeat}</div>
+      <div class="bucket-info">
+        <div class="bucket-name">${r.name}</div>
+        <div class="bucket-balance mono">${fmt(r.amount)}</div>
+      </div>
+      <button class="btn-primary" style="width:auto;padding:10px 16px;margin:0" data-log-recur="${r.id}">${t('log')}</button>`;
+    dueList.appendChild(card);
+  });
+  dueList.querySelectorAll('[data-log-recur]').forEach(el => {
+    el.addEventListener('click', () => { logRecurring(el.dataset.logRecur); renderHome(); });
+  });
+}
+
+function renderPieChart(total) {
+  const cx = 170, cy = 150, r = 60, sw = 26;
+  const C = 2 * Math.PI * r;
+  const labelR = 108;
+  const leaderInner = r + sw / 2 + 4;
+  const leaderOuter = labelR - 14;
+  const active = state.buckets.filter(b => b.pct > 0);
+
+  let cumulative = 0;
+  let arcsHtml = '';
+  let leadersHtml = '';
+  let tagsHtml = '';
+
+  active.forEach(b => {
+    const c = COLORS[b.color];
+    const frac = b.pct / 100;
+    const dash = frac * C;
+    arcsHtml += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${c.solid}" stroke-width="${sw}" stroke-dasharray="${dash} ${C - dash}" stroke-dashoffset="${-cumulative * C}"></circle>`;
+
+    const mid = cumulative + frac / 2;
+    const angle = -Math.PI / 2 + mid * 2 * Math.PI;
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const lx = cx + labelR * cos, ly = cy + labelR * sin;
+    leadersHtml += `<line class="pie-leader" x1="${cx + leaderInner * cos}" y1="${cy + leaderInner * sin}" x2="${cx + leaderOuter * cos}" y2="${cy + leaderOuter * sin}"></line>`;
+    tagsHtml += `<div class="pie-tag" style="left:${(lx / 340) * 100}%; top:${(ly / 300) * 100}%;"><span class="pie-tag-dot" style="background:${c.solid}"></span>${b.name} <b>${b.pct}%</b></div>`;
+
+    cumulative += frac;
+  });
+
+  document.getElementById('pie-arcs').innerHTML = arcsHtml;
+  document.getElementById('pie-leaders').innerHTML = leadersHtml;
+  document.getElementById('pie-tags').innerHTML = tagsHtml;
+  document.getElementById('pie-center-amt').textContent = fmt(total);
+}
+
+/* ── ADD: INCOME ── */
+document.querySelectorAll('.seg').forEach(seg => {
+  seg.addEventListener('click', () => {
+    document.querySelectorAll('.seg').forEach(s => s.classList.toggle('active', s === seg));
+    document.getElementById('form-income').style.display = seg.dataset.seg === 'income' ? 'block' : 'none';
+    document.getElementById('form-expense').style.display = seg.dataset.seg === 'expense' ? 'block' : 'none';
+    document.getElementById('form-recurring').style.display = seg.dataset.seg === 'recurring' ? 'block' : 'none';
+    if (seg.dataset.seg === 'recurring') renderRecurringList();
+  });
+});
+function renderAdd() {
+  document.getElementById('inc-date').value = todayStr();
+  document.getElementById('exp-date').value = todayStr();
+  document.getElementById('inc-amount').value = '';
+  document.getElementById('inc-source').value = '';
+  document.getElementById('exp-amount').value = '';
+  document.getElementById('exp-note').value = '';
+  document.getElementById('inc-submit').disabled = true;
+  document.getElementById('exp-submit').disabled = true;
+  renderIncomePreview();
+  renderExpenseChips();
+  renderRecurringList();
+}
+document.getElementById('inc-amount').addEventListener('input', () => {
+  renderIncomePreview();
+  const amt = parseFloat(document.getElementById('inc-amount').value);
+  document.getElementById('inc-submit').disabled = !(amt > 0);
+});
+document.getElementById('exp-amount').addEventListener('input', () => {
+  const amt = parseFloat(document.getElementById('exp-amount').value);
+  document.getElementById('exp-submit').disabled = !(amt > 0);
+});
+function renderIncomePreview() {
+  const amt = parseFloat(document.getElementById('inc-amount').value) || 0;
+  const box = document.getElementById('inc-preview');
+  box.innerHTML = '';
+  state.buckets.forEach(b => {
+    const c = COLORS[b.color];
+    const row = document.createElement('div');
+    row.className = 'preview-row';
+    row.innerHTML = `<div class="preview-dot" style="background:${c.solid}"></div>
+      <div class="pname">${b.name} <span style="color:var(--dim);font-weight:600">${b.pct}%</span>${b.autoSpend ? ` <span style="color:var(--dim);font-size:0.75em">· ${t('spent_tag')}</span>` : ''}</div>
+      <div class="pamt mono">${fmt(amt * b.pct / 100)}</div>`;
+    box.appendChild(row);
+  });
+}
+document.getElementById('inc-submit').addEventListener('click', () => {
+  const amt = parseFloat(document.getElementById('inc-amount').value);
+  const source = document.getElementById('inc-source').value.trim() || t('income');
+  const date = document.getElementById('inc-date').value || todayStr();
+  if (!amt || amt <= 0) return;
+  const splits = state.buckets.map(b => ({ bucketId: b.id, amount: Math.round(amt * b.pct) / 100 }));
+  splits.forEach(s => { bucket(s.bucketId).balance += s.amount; });
+  state.transactions.push({ id: uid(), type: 'income', amount: amt, source, date, splits });
+  save();
+  switchTab('home');
+});
+
+/* ── ADD: EXPENSE ── */
+let selectedExpenseBucket = null;
+function renderExpenseChips() {
+  const row = document.getElementById('exp-buckets');
+  row.innerHTML = '';
+  if (!selectedExpenseBucket || !bucket(selectedExpenseBucket)) selectedExpenseBucket = state.buckets[0].id;
+  state.buckets.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (b.id === selectedExpenseBucket ? ' active' : '');
+    chip.textContent = b.name;
+    chip.addEventListener('click', () => { selectedExpenseBucket = b.id; renderExpenseChips(); });
+    row.appendChild(chip);
+  });
+  const b = bucket(selectedExpenseBucket);
+  document.getElementById('exp-balance-hint').textContent = t('available_colon', { amt: fmt(b.balance) });
+}
+document.getElementById('exp-submit').addEventListener('click', () => {
+  const amt = parseFloat(document.getElementById('exp-amount').value);
+  const note = document.getElementById('exp-note').value.trim() || t('seg_expense');
+  const date = document.getElementById('exp-date').value || todayStr();
+  if (!amt || amt <= 0 || !selectedExpenseBucket) return;
+  bucket(selectedExpenseBucket).balance -= amt;
+  state.transactions.push({ id: uid(), type: 'expense', amount: amt, note, date, bucketId: selectedExpenseBucket });
+  save();
+  switchTab('home');
+});
+
+/* ── RECURRING ── */
+const FREQ_KEYS = ['weekly', 'biweekly', 'monthly', 'yearly'];
+function freqLabel(key) { return t('freq_' + key); }
+
+function advanceRecurDate(dateStr, freq) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (freq === 'weekly') d.setDate(d.getDate() + 7);
+  else if (freq === 'biweekly') d.setDate(d.getDate() + 14);
+  else if (freq === 'monthly') d.setMonth(d.getMonth() + 1);
+  else if (freq === 'yearly') d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function logRecurring(id) {
+  const r = state.recurring.find(x => x.id === id);
+  const b = r && bucket(r.bucketId);
+  if (!r || !b) return;
+  b.balance -= r.amount;
+  state.transactions.push({ id: uid(), type: 'expense', amount: r.amount, note: r.name, date: todayStr(), bucketId: r.bucketId, recurringId: r.id });
+  r.nextDate = advanceRecurDate(r.nextDate, r.frequency);
+  save();
+}
+
+function renderRecurringList() {
+  const list = document.getElementById('recurring-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (state.recurring.length === 0) {
+    list.innerHTML = `<div class="empty-state">${ICONS.repeat}<p>${t('no_recurring_title')}<br>${t('no_recurring_sub')}</p></div>`;
+    return;
+  }
+  const today = todayStr();
+  [...state.recurring].sort((a, b) => a.nextDate.localeCompare(b.nextDate)).forEach(r => {
+    const b = bucket(r.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    const due = r.nextDate <= today;
+    const card = document.createElement('div');
+    card.className = 'bucket-card';
+    card.style.cursor = 'default';
+    card.innerHTML = `
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS.repeat}</div>
+      <div class="bucket-info">
+        <div class="bucket-name-row"><span class="bucket-name">${r.name}</span><span class="bucket-pct">${freqLabel(r.frequency)}</span></div>
+        <div class="bucket-balance mono">${fmt(r.amount)}</div>
+        <div class="bucket-goal-txt"${due ? ' style="color:var(--text);font-weight:700"' : ''}>${due ? t('due_now_short') : t('next_date', { date: niceDate(r.nextDate) })} · ${b ? b.name : t('unknown_bucket')}</div>
+      </div>
+      <div class="recur-actions">
+        <div class="icon-del-btn" data-log-recur="${r.id}" aria-label="${t('log_recur_aria', { name: r.name })}" role="button">${ICONS.check}</div>
+        <div class="icon-del-btn" data-del-recur="${r.id}" aria-label="${t('delete_name_aria', { name: r.name })}" role="button">${ICONS.trash}</div>
+      </div>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('[data-log-recur]').forEach(el => {
+    el.addEventListener('click', () => { logRecurring(el.dataset.logRecur); renderRecurringList(); });
+  });
+  list.querySelectorAll('[data-del-recur]').forEach(el => {
+    el.addEventListener('click', () => openDeleteRecurringConfirm(el.dataset.delRecur));
+  });
+}
+
+document.getElementById('add-recurring-btn').addEventListener('click', openAddRecurringSheet);
+
+function openAddRecurringSheet() {
+  let selBucket = state.buckets[0].id;
+  let selFreq = 'monthly';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('add_recurring_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="field">
+      <label>${t('name')}</label>
+      <input type="text" id="recur-name" placeholder="${t('name_placeholder')}">
+    </div>
+    <div class="field">
+      <label>${t('amount')}</label>
+      <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="recur-amount"></div>
+    </div>
+    <div class="field">
+      <label>${t('bucket')}</label>
+      <div class="chip-row" id="recur-buckets"></div>
+    </div>
+    <div class="field">
+      <label>${t('repeats')}</label>
+      <div class="chip-row" id="recur-freq"></div>
+    </div>
+    <div class="field">
+      <label>${t('starting')}</label>
+      <input type="date" id="recur-date">
+    </div>
+    <button class="btn-primary" id="recur-submit" disabled>${t('add_recurring_title')}</button>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('recur-date').value = todayStr();
+
+  const bucketsRow = document.getElementById('recur-buckets');
+  state.buckets.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (b.id === selBucket ? ' active' : '');
+    chip.textContent = b.name;
+    chip.addEventListener('click', () => {
+      selBucket = b.id;
+      [...bucketsRow.children].forEach(el => el.classList.remove('active'));
+      chip.classList.add('active');
+    });
+    bucketsRow.appendChild(chip);
+  });
+
+  const freqRow = document.getElementById('recur-freq');
+  FREQ_KEYS.forEach(key => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (key === selFreq ? ' active' : '');
+    chip.textContent = freqLabel(key);
+    chip.addEventListener('click', () => {
+      selFreq = key;
+      [...freqRow.children].forEach(el => el.classList.remove('active'));
+      chip.classList.add('active');
+    });
+    freqRow.appendChild(chip);
+  });
+
+  const amountInput = document.getElementById('recur-amount');
+  const submitBtn = document.getElementById('recur-submit');
+  amountInput.addEventListener('input', () => {
+    submitBtn.disabled = !(parseFloat(amountInput.value) > 0);
+  });
+
+  submitBtn.addEventListener('click', () => {
+    const name = document.getElementById('recur-name').value.trim() || t('recurring_payment_default');
+    const amount = parseFloat(amountInput.value);
+    const date = document.getElementById('recur-date').value || todayStr();
+    if (!(amount > 0)) return;
+    state.recurring.push({ id: uid(), name, amount, bucketId: selBucket, frequency: selFreq, nextDate: date });
+    save();
+    closeSheet();
+    renderRecurringList();
+  });
+}
+
+function openDeleteRecurringConfirm(id) {
+  const r = state.recurring.find(x => x.id === id);
+  if (!r) return;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('delete_name_q', { name: r.name })}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_recurring_text')}</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-del-recur" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del-recur" style="flex:1">${t('delete')}</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-del-recur').addEventListener('click', closeSheet);
+  document.getElementById('confirm-del-recur').addEventListener('click', () => {
+    state.recurring = state.recurring.filter(x => x.id !== id);
+    save();
+    closeSheet();
+    renderRecurringList();
+  });
+}
+
+/* ── HISTORY ── */
+function renderHistory() {
+  const frow = document.getElementById('filter-row');
+  frow.innerHTML = '';
+  const filters = [{ id: 'all', name: t('all') }, ...state.buckets.map(b => ({ id: b.id, name: b.name }))];
+  filters.forEach(f => {
+    const chip = document.createElement('div');
+    chip.className = 'filter-chip' + (currentHistFilter === f.id ? ' active' : '');
+    chip.textContent = f.name;
+    chip.addEventListener('click', () => { currentHistFilter = f.id; renderHistory(); });
+    frow.appendChild(chip);
+  });
+
+  const list = document.getElementById('hist-list');
+  list.innerHTML = '';
+  let items = [...state.transactions];
+  if (currentHistFilter !== 'all') {
+    items = items.filter(t => t.type === 'income' || t.bucketId === currentHistFilter);
+  }
+  items.sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+
+  if (items.length === 0) {
+    list.innerHTML = `<div class="empty-state">${ICONS.empty}<p>${t('no_transactions_title')}<br>${t('no_transactions_sub')}</p></div>`;
+    return;
+  }
+
+  let lastDate = null;
+  items.forEach(tx => {
+    if (tx.date !== lastDate) {
+      const h = document.createElement('div');
+      h.className = 'date-heading';
+      h.textContent = niceDate(tx.date);
+      list.appendChild(h);
+      lastDate = tx.date;
+    }
+    const row = document.createElement('div');
+    row.className = 'hist-item';
+    if (tx.type === 'income') {
+      row.innerHTML = `<div class="hist-icon" style="background:var(--emerald-d);color:var(--emerald)">${ICONS.down}</div>
+        <div class="hist-info"><div class="hist-title">${tx.source}</div><div class="hist-sub">${t('split_across', { n: tx.splits.length })}</div></div>
+        <div class="hist-amt val pos mono">+${fmt(tx.amount)}</div>`;
+    } else {
+      const b = bucket(tx.bucketId);
+      const c = b ? COLORS[b.color] : COLORS.rose;
+      row.innerHTML = `<div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
+        <div class="hist-info"><div class="hist-title">${tx.note}</div><div class="hist-sub">${b ? b.name : t('unknown_bucket')}</div></div>
+        <div class="hist-amt val neg mono">-${fmt(tx.amount)}</div>`;
+    }
+    row.addEventListener('click', () => openDeleteConfirm(tx.id));
+    list.appendChild(row);
+  });
+}
+
+/* ── SETTINGS ── */
+function applyPendingSettingsEdits() {
+  document.querySelectorAll('#settings-list input[data-field]').forEach(input => {
+    const b = bucket(input.dataset.id);
+    if (!b) return;
+    if (input.dataset.field === 'name') b.name = input.value.trim() || b.name;
+    if (input.dataset.field === 'pct') b.pct = Math.max(0, Math.min(100, parseFloat(input.value) || 0));
+    if (input.dataset.field === 'goal') b.goal = input.value ? parseFloat(input.value) : null;
+  });
+}
+
+function renderSettings() {
+  const list = document.getElementById('settings-list');
+  list.innerHTML = '';
+  state.buckets.forEach(b => {
+    const c = COLORS[b.color];
+    const card = document.createElement('div');
+    card.className = 'settings-card';
+    const delBtn = state.buckets.length > 1
+      ? `<div class="icon-del-btn" data-del-bucket="${b.id}" aria-label="${t('delete_name_aria', { name: b.name })}" role="button">${ICONS.trash}</div>` : '';
+    card.innerHTML = `
+      <div class="settings-card-head">
+        <div class="settings-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
+        <input type="text" value="${b.name}" data-field="name" data-id="${b.id}">
+        ${delBtn}
+      </div>
+      <div class="settings-row">
+        <label>${t('percent')}</label>
+        <div class="stepper-row">
+          <div class="stepper-btn" data-step="-1" data-id="${b.id}" aria-label="${t('decrease_percent_aria', { name: b.name })}" role="button">&minus;</div>
+          <input type="number" min="0" max="100" step="1" value="${b.pct}" data-field="pct" data-id="${b.id}">
+          <div class="stepper-btn" data-step="1" data-id="${b.id}" aria-label="${t('increase_percent_aria', { name: b.name })}" role="button">+</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <label>${t('goal')}</label>
+        <input type="number" min="0" step="1" placeholder="${t('no_goal')}" value="${b.goal || ''}" data-field="goal" data-id="${b.id}">
+      </div>
+      <div class="settings-row">
+        <label>${t('spent')}</label>
+        <div class="toggle-switch ${b.autoSpend ? 'on' : ''}" data-autospend-toggle="${b.id}" role="button" aria-label="${t('count_as_spent_aria', { name: b.name })}"><div class="toggle-switch-knob"></div></div>
+        <span class="toggle-hint">${t('counts_toward_spent')}</span>
+      </div>`;
+    list.appendChild(card);
+  });
+
+  const addBucketBtn = document.createElement('button');
+  addBucketBtn.className = 'btn-primary btn-ghost add-bucket-btn';
+  addBucketBtn.textContent = t('add_bucket_btn');
+  addBucketBtn.id = 'add-bucket-btn';
+  list.appendChild(addBucketBtn);
+
+  const sumBar = document.createElement('div');
+  sumBar.id = 'pct-sum-bar';
+  list.appendChild(sumBar);
+
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn-primary';
+  saveBtn.textContent = t('save_changes');
+  saveBtn.id = 'settings-save';
+  list.appendChild(saveBtn);
+
+  function updateSumBar() {
+    const inputs = list.querySelectorAll('input[data-field="pct"]');
+    let sum = 0;
+    inputs.forEach(i => sum += parseFloat(i.value) || 0);
+    const bar = document.getElementById('pct-sum-bar');
+    const ok = sum === 100;
+    bar.className = 'pct-sum-bar ' + (ok ? 'ok' : 'bad');
+    bar.innerHTML = `<span class="pct-sum-label">${ok ? ICONS.check : ICONS.alert}${t('total_allocation')}</span><span>${sum}%</span>`;
+    document.getElementById('settings-save').disabled = sum !== 100;
+  }
+  list.querySelectorAll('input[data-field="pct"]').forEach(i => i.addEventListener('input', updateSumBar));
+  list.querySelectorAll('.stepper-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = list.querySelector(`input[data-field="pct"][data-id="${btn.dataset.id}"]`);
+      const next = Math.max(0, Math.min(100, (parseFloat(input.value) || 0) + parseFloat(btn.dataset.step)));
+      input.value = next;
+      updateSumBar();
+    });
+  });
+  updateSumBar();
+
+  saveBtn.addEventListener('click', () => {
+    applyPendingSettingsEdits();
+    save();
+    renderHome();
+    switchTab('home');
+  });
+
+  addBucketBtn.addEventListener('click', () => {
+    applyPendingSettingsEdits();
+    const idx = state.buckets.length % COLOR_PALETTE.length;
+    const color = COLOR_PALETTE[idx];
+    const icon = ICON_PALETTE[idx];
+    state.buckets.push({ id: uid(), name: t('new_bucket_default'), color, icon, pct: 0, balance: 0, goal: null, autoSpend: false });
+    save();
+    renderSettings();
+  });
+
+  list.querySelectorAll('[data-del-bucket]').forEach(el => {
+    el.addEventListener('click', () => openDeleteBucketConfirm(el.dataset.delBucket));
+  });
+
+  list.querySelectorAll('[data-autospend-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const b = bucket(el.dataset.autospendToggle);
+      if (!b) return;
+      applyPendingSettingsEdits();
+      b.autoSpend = !b.autoSpend;
+      save();
+      renderSettings();
+    });
+  });
+}
+
+function openDeleteBucketConfirm(id) {
+  const b = bucket(id);
+  if (!b || state.buckets.length <= 1) return;
+  const balanceNote = b.balance !== 0
+    ? t('delete_bucket_holds', { amt: fmt(b.balance) })
+    : '';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('delete_name_q', { name: b.name })}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_bucket_text1')}${balanceNote}${t('delete_bucket_text2')}</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-del-bucket" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del-bucket" style="flex:1">${t('delete')}</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-del-bucket').addEventListener('click', closeSheet);
+  document.getElementById('confirm-del-bucket').addEventListener('click', () => {
+    applyPendingSettingsEdits();
+    state.buckets = state.buckets.filter(x => x.id !== id);
+    if (selectedExpenseBucket === id) selectedExpenseBucket = null;
+    if (currentHistFilter === id) currentHistFilter = 'all';
+    save();
+    closeSheet();
+    renderSettings();
+  });
+}
+
+/* ── MODALS ── */
+const overlay = document.getElementById('overlay');
+const sheet = document.getElementById('sheet');
+function openSheet(html) { sheet.innerHTML = html; sheet.style.transform = ''; overlay.classList.add('open'); }
+function closeSheet() { overlay.classList.remove('open'); sheet.style.transform = ''; }
+overlay.addEventListener('click', e => { if (e.target === overlay) closeSheet(); });
+
+/* drag-to-dismiss */
+let dragStartY = null, dragging = false;
+const DRAG_ZONE_HEIGHT = 110;
+sheet.addEventListener('pointerdown', e => {
+  const offsetY = e.clientY - sheet.getBoundingClientRect().top;
+  const onInteractive = e.target.closest('input, textarea, select, button, .sheet-close, .stepper-btn, .chip, .icon-del-btn, [data-del-bucket]');
+  if (offsetY > DRAG_ZONE_HEIGHT || onInteractive) return;
+  dragging = true;
+  dragStartY = e.clientY;
+  sheet.style.transition = 'none';
+  sheet.setPointerCapture(e.pointerId);
+});
+sheet.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  e.preventDefault();
+  const delta = e.clientY - dragStartY;
+  if (delta > 0) sheet.style.transform = `translateY(${delta}px)`;
+});
+function endSheetDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+  const delta = e.clientY - dragStartY;
+  sheet.style.transition = 'transform .25s ease';
+  if (delta > 100) {
+    sheet.style.transform = 'translateY(100%)';
+    setTimeout(closeSheet, 200);
+  } else {
+    sheet.style.transform = '';
+  }
+}
+sheet.addEventListener('pointerup', endSheetDrag);
+sheet.addEventListener('pointercancel', endSheetDrag);
+
+function openBucketDetail(id) {
+  const b = bucket(id);
+  const c = COLORS[b.color];
+  const related = state.transactions.filter(tx => tx.type === 'income' || tx.bucketId === id)
+    .sort((a, z) => (z.date + z.id).localeCompare(a.date + a.id)).slice(0, 8);
+  let histHtml = related.map(tx => {
+    if (tx.type === 'income') {
+      const split = tx.splits.find(s => s.bucketId === id);
+      return `<div class="hist-item" style="cursor:default"><div class="hist-icon" style="background:var(--emerald-d);color:var(--emerald)">${ICONS.down}</div>
+        <div class="hist-info"><div class="hist-title">${tx.source}</div><div class="hist-sub">${niceDate(tx.date)}</div></div>
+        <div class="hist-amt val pos mono">+${fmt(split ? split.amount : 0)}</div></div>`;
+    }
+    return `<div class="hist-item" style="cursor:default"><div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
+      <div class="hist-info"><div class="hist-title">${tx.note}</div><div class="hist-sub">${niceDate(tx.date)}</div></div>
+      <div class="hist-amt val neg mono">-${fmt(tx.amount)}</div></div>`;
+  }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>${t('no_activity_yet')}</p></div>`;
+
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>${b.name}</h3>
+      <div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div>
+    </div>
+    <div class="detail-balance">
+      <div class="n mono" style="color:${c.solid}">${fmt(b.balance)}</div>
+      <div class="l">${t('of_every_deposit', { pct: b.pct })}${b.autoSpend ? t('counted_as_spent_suffix') : ''}</div>
+    </div>
+    <div class="goal-edit-row">
+      <span style="color:var(--dim)">${ICONS.target}</span>
+      <input type="number" id="detail-goal" placeholder="${t('set_goal_placeholder')}" value="${b.goal || ''}">
+      <button class="btn-primary" style="width:auto;padding:12px 16px;margin:0" id="detail-goal-save">${t('save')}</button>
+    </div>
+    <div class="section-title" style="padding:0 0 8px">${t('recent_activity')}</div>
+    <div class="mini-hist">${histHtml}</div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('detail-goal-save').addEventListener('click', () => {
+    const val = document.getElementById('detail-goal').value;
+    b.goal = val ? parseFloat(val) : null;
+    save();
+    closeSheet();
+    renderHome();
+  });
+}
+
+function openDeleteConfirm(txId) {
+  const tx = state.transactions.find(x => x.id === txId);
+  if (!tx) return;
+  const desc = tx.type === 'income'
+    ? t('income_of_from', { amt: fmt(tx.amount), source: tx.source })
+    : t('expense_of', { amt: fmt(tx.amount), note: tx.note });
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('delete_entry_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_entry_text', { desc })}</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-del" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del" style="flex:1">${t('delete')}</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-del').addEventListener('click', closeSheet);
+  document.getElementById('confirm-del').addEventListener('click', () => {
+    if (tx.type === 'income') {
+      tx.splits.forEach(s => { const b = bucket(s.bucketId); if (b) b.balance -= s.amount; });
+    } else {
+      const b = bucket(tx.bucketId);
+      if (b) b.balance += tx.amount;
+    }
+    state.transactions = state.transactions.filter(x => x.id !== txId);
+    save();
+    closeSheet();
+    renderHistory();
+  });
+}
+
+function openResetConfirm() {
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('reset_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('reset_text')}</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-reset" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-reset" style="flex:1">${t('reset')}</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-reset').addEventListener('click', closeSheet);
+  document.getElementById('confirm-reset').addEventListener('click', () => {
+    state = structuredClone(DEFAULT_STATE);
+    save();
+    closeSheet();
+    switchTab('home');
+  });
+}
+
+/* ── PROFILE ── */
+document.getElementById('avatar-btn').addEventListener('click', openProfile);
+document.getElementById('spent-stat-btn').addEventListener('click', openSpendingBreakdown);
+document.getElementById('spent-stat-btn').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSpendingBreakdown(); }
+});
+
+function openProfile() {
+  const name = state.profile.name || '';
+  const initial = name.trim() ? name.trim()[0].toUpperCase() : ICONS.user;
+  const langChips = LANGUAGES.map(l =>
+    `<div class="chip${l.code === (state.lang || 'en') ? ' active' : ''}" data-lang="${l.code}">${l.label}</div>`
+  ).join('');
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('profile_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="profile-avatar-row">
+      <div class="avatar-lg" id="profile-avatar-lg">${initial}</div>
+      <div class="field" style="flex:1;margin-bottom:0">
+        <label>${t('your_name')}</label>
+        <input type="text" id="profile-name" placeholder="${t('add_your_name_placeholder')}" value="${name}">
+      </div>
+    </div>
+    <div class="section-title" style="padding:0 0 8px">${t('language_section')}</div>
+    <div class="chip-row" id="lang-chips">${langChips}</div>
+    <div class="section-title" style="padding:16px 0 8px">${t('app_section')}</div>
+    <div class="profile-menu">
+      <div class="profile-menu-item" id="export-data-btn">${ICONS.download}${t('export_data')}<span class="chev">${ICONS.chev}</span></div>
+      <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}${t('import_data')}<span class="chev">${ICONS.chev}</span></div>
+      <input type="file" id="import-file-input" accept="application/json" style="display:none">
+    </div>
+    <div class="section-title" style="padding:16px 0 8px">${t('about_section')}</div>
+    <div class="about-box">
+      <div class="about-name">Wealth Split</div>
+      <div class="about-desc">${t('app_desc')}</div>
+    </div>
+    <div class="danger-zone">
+      <button class="btn-primary btn-danger" id="profile-reset-btn">${t('reset_all_data_btn')}</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('profile-name').addEventListener('input', e => {
+    state.profile.name = e.target.value;
+    save();
+    updateProfileUI();
+    const val = e.target.value.trim();
+    document.getElementById('profile-avatar-lg').innerHTML = val ? val[0].toUpperCase() : ICONS.user;
+  });
+  document.getElementById('lang-chips').querySelectorAll('[data-lang]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.dataset.lang === state.lang) return;
+      state.lang = chip.dataset.lang;
+      save();
+      applyI18n();
+      renderHome();
+      openProfile();
+    });
+  });
+  document.getElementById('export-data-btn').addEventListener('click', exportData);
+  document.getElementById('import-data-btn').addEventListener('click', () => {
+    document.getElementById('import-file-input').click();
+  });
+  document.getElementById('import-file-input').addEventListener('change', handleImportFile);
+  document.getElementById('profile-reset-btn').addEventListener('click', () => {
+    closeSheet();
+    openResetConfirm();
+  });
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wealth-split-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed.buckets || !parsed.transactions) throw new Error('bad format');
+      if (!parsed.profile) parsed.profile = { name: '' };
+      if (!parsed.recurring) parsed.recurring = [];
+      if (!parsed.lang || !LOCALE_MAP[parsed.lang]) parsed.lang = 'en';
+      state = parsed;
+      save();
+      closeSheet();
+      switchTab('home');
+    } catch (err) {
+      openImportError();
+    }
+  };
+  reader.readAsText(file);
+}
+
+function openImportError() {
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>${t('couldnt_import_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('couldnt_import_text')}</div>
+    <button class="btn-primary" id="import-error-ok">${t('ok')}</button>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('import-error-ok').addEventListener('click', closeSheet);
+}
+
+applyI18n();
+renderHome();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>

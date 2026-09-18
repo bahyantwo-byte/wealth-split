@@ -227,6 +227,11 @@ input:focus { border-color: var(--dim); }
 .stepper-btn:active { transform: scale(0.9); }
 .icon-del-btn { width: 32px; height: 32px; border-radius: 10px; background: var(--bg3); display: flex; align-items: center; justify-content: center; color: var(--dim); flex-shrink: 0; cursor: pointer; }
 .icon-del-btn svg { width: 16px; height: 16px; }
+.toggle-switch { width: 42px; height: 25px; border-radius: 13px; background: var(--bg4); border: 1px solid var(--border); position: relative; cursor: pointer; flex-shrink: 0; transition: background .2s; }
+.toggle-switch.on { background: var(--text); border-color: var(--text); }
+.toggle-switch-knob { width: 17px; height: 17px; border-radius: 50%; background: var(--dim); position: absolute; top: 3px; left: 3px; transition: transform .2s, background .2s; }
+.toggle-switch.on .toggle-switch-knob { transform: translateX(17px); background: var(--bg); }
+.toggle-hint { font-size: 0.72rem; color: var(--dim); line-height: 1.3; }
 .settings-card input[type=text][data-field="name"] { flex: 1; margin-bottom: 0; }
 .pct-sum-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 700; margin-bottom: 12px; }
 .pct-sum-bar .pct-sum-label { display: flex; align-items: center; gap: 8px; }
@@ -450,11 +455,11 @@ const ICON_PALETTE = ['home', 'heart', 'trendUp', 'flag', 'award', 'star', 'comp
 
 const DEFAULT_STATE = {
   buckets: [
-    { id: 'essentials', name: 'Essentials',       color: 'gold',    icon: 'home',    pct: 55, balance: 0, goal: null },
-    { id: 'guiltfree',  name: 'Guilt-Free',        color: 'rose',    icon: 'heart',   pct: 5,  balance: 0, goal: null },
-    { id: 'payoff',     name: 'Payoff / Invest',   color: 'orange',  icon: 'trendUp', pct: 10, balance: 0, goal: null },
-    { id: 'save',       name: 'Save Toward Goal',  color: 'sky',     icon: 'flag',    pct: 15, balance: 0, goal: null },
-    { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', icon: 'award',   pct: 15, balance: 0, goal: null },
+    { id: 'essentials', name: 'Essentials',       color: 'gold',    icon: 'home',    pct: 55, balance: 0, goal: null, autoSpend: false },
+    { id: 'guiltfree',  name: 'Guilt-Free',        color: 'rose',    icon: 'heart',   pct: 5,  balance: 0, goal: null, autoSpend: false },
+    { id: 'payoff',     name: 'Payoff / Invest',   color: 'orange',  icon: 'trendUp', pct: 10, balance: 0, goal: null, autoSpend: false },
+    { id: 'save',       name: 'Save Toward Goal',  color: 'sky',     icon: 'flag',    pct: 15, balance: 0, goal: null, autoSpend: true },
+    { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', icon: 'award',   pct: 15, balance: 0, goal: null, autoSpend: false },
   ],
   transactions: [],
   profile: { name: '' },
@@ -472,6 +477,7 @@ function load() {
     let migrated = false;
     parsed.buckets.forEach((b, i) => {
       if (!b.icon || !ICONS[b.icon]) { b.icon = ICON_PALETTE[i % ICON_PALETTE.length]; migrated = true; }
+      if (typeof b.autoSpend !== 'boolean') { b.autoSpend = (b.id === 'save'); migrated = true; }
     });
     if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
@@ -516,12 +522,25 @@ function updateProfileUI() {
   if (greet) greet.textContent = name ? `${period}, ${name}` : period;
 }
 
+function calcTotalSpent() {
+  return state.transactions.reduce((s, t) => {
+    if (t.type === 'expense') return s + t.amount;
+    if (t.type === 'income') {
+      return s + t.splits.reduce((ss, sp) => {
+        const sb = bucket(sp.bucketId);
+        return ss + (sb && sb.autoSpend ? sp.amount : 0);
+      }, 0);
+    }
+    return s;
+  }, 0);
+}
+
 function renderHome() {
   document.getElementById('home-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   updateProfileUI();
   const total = state.buckets.reduce((s, b) => s + b.balance, 0);
   const totalIncome = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-  const totalSpent = state.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const totalSpent = calcTotalSpent();
   document.getElementById('summary-total').textContent = fmt(total);
   document.getElementById('summary-income').textContent = fmt(totalIncome);
   document.getElementById('summary-spent').textContent = fmt(totalSpent);
@@ -538,11 +557,13 @@ function renderHome() {
       goalHtml = `<div class="bucket-goal-bar"><div class="bucket-goal-fill" style="width:${pctFill}%;background:${c.solid}"></div></div>
         <div class="bucket-goal-txt">${fmt(b.balance)} of ${fmt(b.goal)} goal</div>`;
     }
+    const autoSpendHtml = b.autoSpend ? `<div class="bucket-goal-txt">Counted as spent when added</div>` : '';
     card.innerHTML = `
       <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
       <div class="bucket-info">
         <div class="bucket-name-row"><span class="bucket-name">${b.name}</span><span class="bucket-pct">${b.pct}%</span></div>
         <div class="bucket-balance mono">${fmt(b.balance)}</div>
+        ${autoSpendHtml}
         ${goalHtml}
       </div>
       <div class="chev">${ICONS.chev}</div>`;
@@ -626,7 +647,7 @@ function renderIncomePreview() {
     const row = document.createElement('div');
     row.className = 'preview-row';
     row.innerHTML = `<div class="preview-dot" style="background:${c.solid}"></div>
-      <div class="pname">${b.name} <span style="color:var(--dim);font-weight:600">${b.pct}%</span></div>
+      <div class="pname">${b.name} <span style="color:var(--dim);font-weight:600">${b.pct}%</span>${b.autoSpend ? ' <span style="color:var(--dim);font-size:0.75em">· spent</span>' : ''}</div>
       <div class="pamt mono">${fmt(amt * b.pct / 100)}</div>`;
     box.appendChild(row);
   });
@@ -760,6 +781,11 @@ function renderSettings() {
       <div class="settings-row">
         <label>Goal</label>
         <input type="number" min="0" step="1" placeholder="No goal" value="${b.goal || ''}" data-field="goal" data-id="${b.id}">
+      </div>
+      <div class="settings-row">
+        <label>Spent</label>
+        <div class="toggle-switch ${b.autoSpend ? 'on' : ''}" data-autospend-toggle="${b.id}" role="button" aria-label="Count ${b.name} as spent when added"><div class="toggle-switch-knob"></div></div>
+        <span class="toggle-hint">Counts toward Spent when added</span>
       </div>`;
     list.appendChild(card);
   });
@@ -813,13 +839,24 @@ function renderSettings() {
     const idx = state.buckets.length % COLOR_PALETTE.length;
     const color = COLOR_PALETTE[idx];
     const icon = ICON_PALETTE[idx];
-    state.buckets.push({ id: uid(), name: 'New Bucket', color, icon, pct: 0, balance: 0, goal: null });
+    state.buckets.push({ id: uid(), name: 'New Bucket', color, icon, pct: 0, balance: 0, goal: null, autoSpend: false });
     save();
     renderSettings();
   });
 
   list.querySelectorAll('[data-del-bucket]').forEach(el => {
     el.addEventListener('click', () => openDeleteBucketConfirm(el.dataset.delBucket));
+  });
+
+  list.querySelectorAll('[data-autospend-toggle]').forEach(el => {
+    el.addEventListener('click', () => {
+      const b = bucket(el.dataset.autospendToggle);
+      if (!b) return;
+      applyPendingSettingsEdits();
+      b.autoSpend = !b.autoSpend;
+      save();
+      renderSettings();
+    });
   });
 }
 
@@ -916,7 +953,7 @@ function openBucketDetail(id) {
     </div>
     <div class="detail-balance">
       <div class="n mono" style="color:${c.solid}">${fmt(b.balance)}</div>
-      <div class="l">${b.pct}% of every deposit</div>
+      <div class="l">${b.pct}% of every deposit${b.autoSpend ? ' · Counted as spent' : ''}</div>
     </div>
     <div class="goal-edit-row">
       <span style="color:var(--dim)">${ICONS.target}</span>

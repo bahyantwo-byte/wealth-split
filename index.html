@@ -310,10 +310,6 @@ input:focus { border-color: var(--dim); }
           <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>Spent</div>
           <div class="val neg mono" id="summary-spent">$0</div>
         </div>
-        <div class="summary-stat">
-          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>Total</div>
-          <div class="val mono" id="summary-total">$0</div>
-        </div>
       </div>
     </div>
     <div class="section-title" id="due-title" style="display:none">Due Now</div>
@@ -558,7 +554,6 @@ function renderHome() {
   const total = state.buckets.reduce((s, b) => s + b.balance, 0);
   const totalIncome = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const totalSpent = calcTotalSpent();
-  document.getElementById('summary-total').textContent = fmt(total);
   document.getElementById('summary-income').textContent = fmt(totalIncome);
   document.getElementById('summary-spent').textContent = fmt(totalSpent);
   const available = totalIncome - totalSpent;

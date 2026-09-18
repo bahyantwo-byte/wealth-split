@@ -150,6 +150,8 @@ body::before {
 .bucket-goal-fill { height: 100%; border-radius: 3px; transition: width .3s; }
 .bucket-goal-txt { font-size: 0.65rem; color: var(--dim); margin-top: 4px; }
 .chev { color: var(--dim); flex-shrink: 0; }
+.recur-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.due-hint { padding: 0 20px 4px; font-size: 0.78rem; color: var(--dim); }
 
 /* ── ADD ── */
 .add-top { padding: 22px 20px 10px; flex-shrink: 0; }
@@ -309,6 +311,8 @@ input:focus { border-color: var(--dim); }
         </div>
       </div>
     </div>
+    <div class="section-title" id="due-title" style="display:none">Due Now</div>
+    <div class="bucket-list" id="due-list" style="display:none"></div>
     <div class="section-title">Allocation</div>
     <div class="pie-card">
       <div class="pie-chart-wrap">
@@ -335,6 +339,7 @@ input:focus { border-color: var(--dim); }
     <div class="segmented">
       <div class="seg active" data-seg="income">Income</div>
       <div class="seg" data-seg="expense">Expense</div>
+      <div class="seg" data-seg="recurring">Recurring</div>
     </div>
     <div class="form-wrap" id="form-income">
       <div class="field">
@@ -374,6 +379,10 @@ input:focus { border-color: var(--dim); }
         <input type="date" id="exp-date">
       </div>
       <button class="btn-primary" id="exp-submit">Log Expense</button>
+    </div>
+    <div class="form-wrap" id="form-recurring" style="display:none">
+      <div id="recurring-list"></div>
+      <button class="btn-primary btn-ghost" id="add-recurring-btn" style="margin-top:12px">+ Add Recurring</button>
     </div>
   </div>
 
@@ -435,7 +444,8 @@ const ICONS = {
   alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
   user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
   download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  repeat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>'
 };
 
 const COLORS = {
@@ -463,6 +473,7 @@ const DEFAULT_STATE = {
   ],
   transactions: [],
   profile: { name: '' },
+  recurring: [],
 };
 
 let state = load();
@@ -480,6 +491,7 @@ function load() {
       if (typeof b.autoSpend !== 'boolean') { b.autoSpend = (b.id === 'save'); migrated = true; }
     });
     if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
+    if (!parsed.recurring) { parsed.recurring = []; migrated = true; }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
@@ -572,6 +584,40 @@ function renderHome() {
   });
 
   renderPieChart(total);
+  renderDueBanner();
+}
+
+function renderDueBanner() {
+  const dueTitle = document.getElementById('due-title');
+  const dueList = document.getElementById('due-list');
+  const today = todayStr();
+  const due = state.recurring.filter(r => r.nextDate <= today).sort((a, b) => a.nextDate.localeCompare(b.nextDate));
+  if (due.length === 0) {
+    dueTitle.style.display = 'none';
+    dueList.style.display = 'none';
+    return;
+  }
+  dueTitle.style.display = 'block';
+  dueList.style.display = 'flex';
+  dueList.innerHTML = '';
+  due.forEach(r => {
+    const b = bucket(r.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    const card = document.createElement('div');
+    card.className = 'bucket-card';
+    card.style.cursor = 'default';
+    card.innerHTML = `
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS.repeat}</div>
+      <div class="bucket-info">
+        <div class="bucket-name">${r.name}</div>
+        <div class="bucket-balance mono">${fmt(r.amount)}</div>
+      </div>
+      <button class="btn-primary" style="width:auto;padding:10px 16px;margin:0" data-log-recur="${r.id}">Log</button>`;
+    dueList.appendChild(card);
+  });
+  dueList.querySelectorAll('[data-log-recur]').forEach(el => {
+    el.addEventListener('click', () => { logRecurring(el.dataset.logRecur); renderHome(); });
+  });
 }
 
 function renderPieChart(total) {
@@ -615,6 +661,8 @@ document.querySelectorAll('.seg').forEach(seg => {
     document.querySelectorAll('.seg').forEach(s => s.classList.toggle('active', s === seg));
     document.getElementById('form-income').style.display = seg.dataset.seg === 'income' ? 'block' : 'none';
     document.getElementById('form-expense').style.display = seg.dataset.seg === 'expense' ? 'block' : 'none';
+    document.getElementById('form-recurring').style.display = seg.dataset.seg === 'recurring' ? 'block' : 'none';
+    if (seg.dataset.seg === 'recurring') renderRecurringList();
   });
 });
 function renderAdd() {
@@ -628,6 +676,7 @@ function renderAdd() {
   document.getElementById('exp-submit').disabled = true;
   renderIncomePreview();
   renderExpenseChips();
+  renderRecurringList();
 }
 document.getElementById('inc-amount').addEventListener('input', () => {
   renderIncomePreview();
@@ -690,6 +739,164 @@ document.getElementById('exp-submit').addEventListener('click', () => {
   save();
   switchTab('home');
 });
+
+/* ── RECURRING ── */
+const FREQ_LABELS = { weekly: 'Weekly', biweekly: 'Biweekly', monthly: 'Monthly', yearly: 'Yearly' };
+
+function advanceRecurDate(dateStr, freq) {
+  const d = new Date(dateStr + 'T00:00:00');
+  if (freq === 'weekly') d.setDate(d.getDate() + 7);
+  else if (freq === 'biweekly') d.setDate(d.getDate() + 14);
+  else if (freq === 'monthly') d.setMonth(d.getMonth() + 1);
+  else if (freq === 'yearly') d.setFullYear(d.getFullYear() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function logRecurring(id) {
+  const r = state.recurring.find(x => x.id === id);
+  const b = r && bucket(r.bucketId);
+  if (!r || !b) return;
+  b.balance -= r.amount;
+  state.transactions.push({ id: uid(), type: 'expense', amount: r.amount, note: r.name, date: todayStr(), bucketId: r.bucketId, recurringId: r.id });
+  r.nextDate = advanceRecurDate(r.nextDate, r.frequency);
+  save();
+}
+
+function renderRecurringList() {
+  const list = document.getElementById('recurring-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (state.recurring.length === 0) {
+    list.innerHTML = `<div class="empty-state">${ICONS.repeat}<p>No recurring payments yet.<br>Add a bill or subscription to get reminded when it's due.</p></div>`;
+    return;
+  }
+  const today = todayStr();
+  [...state.recurring].sort((a, b) => a.nextDate.localeCompare(b.nextDate)).forEach(r => {
+    const b = bucket(r.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    const due = r.nextDate <= today;
+    const card = document.createElement('div');
+    card.className = 'bucket-card';
+    card.style.cursor = 'default';
+    card.innerHTML = `
+      <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS.repeat}</div>
+      <div class="bucket-info">
+        <div class="bucket-name-row"><span class="bucket-name">${r.name}</span><span class="bucket-pct">${FREQ_LABELS[r.frequency]}</span></div>
+        <div class="bucket-balance mono">${fmt(r.amount)}</div>
+        <div class="bucket-goal-txt"${due ? ' style="color:var(--text);font-weight:700"' : ''}>${due ? 'Due now' : 'Next ' + niceDate(r.nextDate)} · ${b ? b.name : 'Unknown bucket'}</div>
+      </div>
+      <div class="recur-actions">
+        <div class="icon-del-btn" data-log-recur="${r.id}" aria-label="Log ${r.name} now" role="button">${ICONS.check}</div>
+        <div class="icon-del-btn" data-del-recur="${r.id}" aria-label="Delete ${r.name}" role="button">${ICONS.trash}</div>
+      </div>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('[data-log-recur]').forEach(el => {
+    el.addEventListener('click', () => { logRecurring(el.dataset.logRecur); renderRecurringList(); });
+  });
+  list.querySelectorAll('[data-del-recur]').forEach(el => {
+    el.addEventListener('click', () => openDeleteRecurringConfirm(el.dataset.delRecur));
+  });
+}
+
+document.getElementById('add-recurring-btn').addEventListener('click', openAddRecurringSheet);
+
+function openAddRecurringSheet() {
+  let selBucket = state.buckets[0].id;
+  let selFreq = 'monthly';
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Add Recurring</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="field">
+      <label>Name</label>
+      <input type="text" id="recur-name" placeholder="e.g. Netflix">
+    </div>
+    <div class="field">
+      <label>Amount</label>
+      <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="recur-amount"></div>
+    </div>
+    <div class="field">
+      <label>Bucket</label>
+      <div class="chip-row" id="recur-buckets"></div>
+    </div>
+    <div class="field">
+      <label>Repeats</label>
+      <div class="chip-row" id="recur-freq"></div>
+    </div>
+    <div class="field">
+      <label>Starting</label>
+      <input type="date" id="recur-date">
+    </div>
+    <button class="btn-primary" id="recur-submit" disabled>Add Recurring</button>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('recur-date').value = todayStr();
+
+  const bucketsRow = document.getElementById('recur-buckets');
+  state.buckets.forEach(b => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (b.id === selBucket ? ' active' : '');
+    chip.textContent = b.name;
+    chip.addEventListener('click', () => {
+      selBucket = b.id;
+      [...bucketsRow.children].forEach(el => el.classList.remove('active'));
+      chip.classList.add('active');
+    });
+    bucketsRow.appendChild(chip);
+  });
+
+  const freqRow = document.getElementById('recur-freq');
+  Object.entries(FREQ_LABELS).forEach(([key, label]) => {
+    const chip = document.createElement('div');
+    chip.className = 'chip' + (key === selFreq ? ' active' : '');
+    chip.textContent = label;
+    chip.addEventListener('click', () => {
+      selFreq = key;
+      [...freqRow.children].forEach(el => el.classList.remove('active'));
+      chip.classList.add('active');
+    });
+    freqRow.appendChild(chip);
+  });
+
+  const amountInput = document.getElementById('recur-amount');
+  const submitBtn = document.getElementById('recur-submit');
+  amountInput.addEventListener('input', () => {
+    submitBtn.disabled = !(parseFloat(amountInput.value) > 0);
+  });
+
+  submitBtn.addEventListener('click', () => {
+    const name = document.getElementById('recur-name').value.trim() || 'Recurring Payment';
+    const amount = parseFloat(amountInput.value);
+    const date = document.getElementById('recur-date').value || todayStr();
+    if (!(amount > 0)) return;
+    state.recurring.push({ id: uid(), name, amount, bucketId: selBucket, frequency: selFreq, nextDate: date });
+    save();
+    closeSheet();
+    renderRecurringList();
+  });
+}
+
+function openDeleteRecurringConfirm(id) {
+  const r = state.recurring.find(x => x.id === id);
+  if (!r) return;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Delete "${r.name}"?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">This stops the reminder. Past transactions already logged from it stay in History.</div>
+    <div class="btn-row">
+      <button class="btn-primary btn-ghost" id="cancel-del-recur" style="flex:1">Cancel</button>
+      <button class="btn-primary btn-danger" id="confirm-del-recur" style="flex:1">Delete</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('cancel-del-recur').addEventListener('click', closeSheet);
+  document.getElementById('confirm-del-recur').addEventListener('click', () => {
+    state.recurring = state.recurring.filter(x => x.id !== id);
+    save();
+    closeSheet();
+    renderRecurringList();
+  });
+}
 
 /* ── HISTORY ── */
 function renderHistory() {
@@ -1094,6 +1301,7 @@ function handleImportFile(e) {
       const parsed = JSON.parse(reader.result);
       if (!parsed.buckets || !parsed.transactions) throw new Error('bad format');
       if (!parsed.profile) parsed.profile = { name: '' };
+      if (!parsed.recurring) parsed.recurring = [];
       state = parsed;
       save();
       closeSheet();

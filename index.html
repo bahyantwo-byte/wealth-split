@@ -241,8 +241,8 @@ input[type=date] { color-scheme: dark; }
   animation: slideUp .22s ease-out;
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.sheet-handle { width: 36px; height: 4px; border-radius: 3px; background: var(--border); margin: 8px auto 14px; }
-.sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.sheet-handle { width: 36px; height: 4px; border-radius: 3px; background: var(--border); margin: 8px auto 14px; touch-action: none; cursor: grab; }
+.sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; touch-action: none; cursor: grab; }
 .sheet-head h3 { font-size: 1.15rem; font-weight: 800; }
 .sheet-close { width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--dim); }
 .detail-balance { text-align: center; padding: 10px 0 18px; }
@@ -833,9 +833,38 @@ function openDeleteBucketConfirm(id) {
 /* ── MODALS ── */
 const overlay = document.getElementById('overlay');
 const sheet = document.getElementById('sheet');
-function openSheet(html) { sheet.innerHTML = html; overlay.classList.add('open'); }
-function closeSheet() { overlay.classList.remove('open'); }
+function openSheet(html) { sheet.innerHTML = html; sheet.style.transform = ''; overlay.classList.add('open'); }
+function closeSheet() { overlay.classList.remove('open'); sheet.style.transform = ''; }
 overlay.addEventListener('click', e => { if (e.target === overlay) closeSheet(); });
+
+/* drag-to-dismiss */
+let dragStartY = null, dragging = false;
+sheet.addEventListener('pointerdown', e => {
+  if (!e.target.closest('.sheet-handle, .sheet-head')) return;
+  dragging = true;
+  dragStartY = e.clientY;
+  sheet.style.transition = 'none';
+  sheet.setPointerCapture(e.pointerId);
+});
+sheet.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const delta = e.clientY - dragStartY;
+  if (delta > 0) sheet.style.transform = `translateY(${delta}px)`;
+});
+function endSheetDrag(e) {
+  if (!dragging) return;
+  dragging = false;
+  const delta = e.clientY - dragStartY;
+  sheet.style.transition = 'transform .25s ease';
+  if (delta > 100) {
+    sheet.style.transform = 'translateY(100%)';
+    setTimeout(closeSheet, 200);
+  } else {
+    sheet.style.transform = '';
+  }
+}
+sheet.addEventListener('pointerup', endSheetDrag);
+sheet.addEventListener('pointercancel', endSheetDrag);
 
 function openBucketDetail(id) {
   const b = bucket(id);

@@ -299,29 +299,29 @@ input:focus { border-color: var(--dim); }
           <div class="home-eyebrow" id="home-date"></div>
           <div class="home-greeting" id="home-greeting"></div>
         </div>
-        <div class="avatar-btn" id="avatar-btn" aria-label="Open profile" role="button"><span id="avatar-initial"></span></div>
+        <div class="avatar-btn" id="avatar-btn" data-i18n-aria="open_profile" role="button"><span id="avatar-initial"></span></div>
       </div>
     </div>
     <div class="summary-card">
-      <div class="summary-label">Available to Spend</div>
+      <div class="summary-label" data-i18n="available_to_spend">Available to Spend</div>
       <div class="summary-total mono" id="summary-available">$0</div>
       <div class="summary-stats">
         <div class="summary-stat">
-          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>Income</div>
+          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg><span data-i18n="income">Income</span></div>
           <div class="val pos mono" id="summary-income">$0</div>
         </div>
-        <div class="summary-stat" id="spent-stat-btn" role="button" tabindex="0" aria-label="View spending breakdown by category">
+        <div class="summary-stat" id="spent-stat-btn" role="button" tabindex="0" data-i18n-aria="spending_breakdown_aria">
           <div class="lbl" style="justify-content:space-between">
-            <span style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>Spent</span>
+            <span style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg><span data-i18n="spent">Spent</span></span>
             <svg viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>
           </div>
           <div class="val neg mono" id="summary-spent">$0</div>
         </div>
       </div>
     </div>
-    <div class="section-title" id="due-title" style="display:none">Due Now</div>
+    <div class="section-title" id="due-title" data-i18n="due_now" style="display:none">Due Now</div>
     <div class="bucket-list" id="due-list" style="display:none"></div>
-    <div class="section-title">Allocation</div>
+    <div class="section-title" data-i18n="allocation">Allocation</div>
     <div class="pie-card">
       <div class="pie-chart-wrap">
         <svg viewBox="0 0 340 300" id="pie-svg">
@@ -331,98 +331,98 @@ input:focus { border-color: var(--dim); }
         </svg>
         <div class="pie-center">
           <div class="pie-center-amt mono" id="pie-center-amt">$0</div>
-          <div class="pie-center-lbl">Total</div>
+          <div class="pie-center-lbl" data-i18n="total">Total</div>
         </div>
         <div id="pie-tags"></div>
       </div>
     </div>
 
-    <div class="section-title">Your Buckets</div>
+    <div class="section-title" data-i18n="your_buckets">Your Buckets</div>
     <div class="bucket-list" id="bucket-list"></div>
   </div>
 
   <!-- ADD -->
   <div class="screen" id="screen-add">
-    <div class="add-top"><div class="add-title">Add</div></div>
+    <div class="add-top"><div class="add-title" data-i18n="nav_add">Add</div></div>
     <div class="segmented">
-      <div class="seg active" data-seg="income">Income</div>
-      <div class="seg" data-seg="expense">Expense</div>
-      <div class="seg" data-seg="recurring">Recurring</div>
+      <div class="seg active" data-seg="income" data-i18n="income">Income</div>
+      <div class="seg" data-seg="expense" data-i18n="seg_expense">Expense</div>
+      <div class="seg" data-seg="recurring" data-i18n="seg_recurring">Recurring</div>
     </div>
     <div class="form-wrap" id="form-income">
       <div class="field">
-        <label>Amount</label>
+        <label data-i18n="amount">Amount</label>
         <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="inc-amount"></div>
       </div>
       <div class="field">
-        <label>Source</label>
-        <input type="text" id="inc-source" placeholder="e.g. Paycheck">
+        <label data-i18n="source">Source</label>
+        <input type="text" id="inc-source" placeholder="e.g. Paycheck" data-i18n-placeholder="source_placeholder">
       </div>
       <div class="field">
-        <label>Date</label>
+        <label data-i18n="date">Date</label>
         <input type="date" id="inc-date">
       </div>
       <div class="field">
-        <label>Split Preview</label>
+        <label data-i18n="split_preview">Split Preview</label>
         <div class="preview-box" id="inc-preview"></div>
       </div>
-      <button class="btn-primary" id="inc-submit">Add Income</button>
+      <button class="btn-primary" id="inc-submit" data-i18n="add_income_btn">Add Income</button>
     </div>
     <div class="form-wrap" id="form-expense" style="display:none">
       <div class="field">
-        <label>Bucket</label>
+        <label data-i18n="bucket">Bucket</label>
         <div class="chip-row" id="exp-buckets"></div>
         <div class="bucket-balance-hint" id="exp-balance-hint"></div>
       </div>
       <div class="field">
-        <label>Amount</label>
+        <label data-i18n="amount">Amount</label>
         <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="exp-amount"></div>
       </div>
       <div class="field">
-        <label>Note</label>
-        <input type="text" id="exp-note" placeholder="e.g. Groceries">
+        <label data-i18n="note">Note</label>
+        <input type="text" id="exp-note" placeholder="e.g. Groceries" data-i18n-placeholder="note_placeholder">
       </div>
       <div class="field">
-        <label>Date</label>
+        <label data-i18n="date">Date</label>
         <input type="date" id="exp-date">
       </div>
-      <button class="btn-primary" id="exp-submit">Log Expense</button>
+      <button class="btn-primary" id="exp-submit" data-i18n="log_expense_btn">Log Expense</button>
     </div>
     <div class="form-wrap" id="form-recurring" style="display:none">
       <div id="recurring-list"></div>
-      <button class="btn-primary btn-ghost" id="add-recurring-btn" style="margin-top:12px">+ Add Recurring</button>
+      <button class="btn-primary btn-ghost" id="add-recurring-btn" style="margin-top:12px" data-i18n="add_recurring_btn">+ Add Recurring</button>
     </div>
   </div>
 
   <!-- HISTORY -->
   <div class="screen" id="screen-history">
-    <div class="history-top"><div class="add-title">History</div></div>
+    <div class="history-top"><div class="add-title" data-i18n="history_title">History</div></div>
     <div class="filter-row" id="filter-row"></div>
     <div class="hist-list" id="hist-list"></div>
   </div>
 
   <!-- SETTINGS -->
   <div class="screen" id="screen-settings">
-    <div class="settings-top"><div class="add-title">Settings</div></div>
+    <div class="settings-top"><div class="add-title" data-i18n="settings_title">Settings</div></div>
     <div class="settings-list" id="settings-list"></div>
   </div>
 
   <div class="tabbar">
     <div class="tab active" data-tab="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span>Home</span>
+      <span data-i18n="nav_home">Home</span>
     </div>
     <div class="tab" data-tab="add">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-      <span>Add</span>
+      <span data-i18n="nav_add">Add</span>
     </div>
     <div class="tab" data-tab="history">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span>History</span>
+      <span data-i18n="nav_history">History</span>
     </div>
     <div class="tab" data-tab="settings">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-      <span>Settings</span>
+      <span data-i18n="nav_settings">Settings</span>
     </div>
   </div>
 </div>
@@ -471,6 +471,272 @@ const COLORS = {
 const COLOR_PALETTE = Object.keys(COLORS);
 const ICON_PALETTE = ['home', 'heart', 'trendUp', 'flag', 'award', 'star', 'compass', 'gift', 'briefcase', 'anchor'];
 
+const LANGUAGES = [
+  { code: 'en', label: 'English' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português' },
+  { code: 'ko', label: '한국어' },
+  { code: 'ja', label: '日本語' },
+];
+const LOCALE_MAP = { en: 'en-US', es: 'es-ES', pt: 'pt-BR', ko: 'ko-KR', ja: 'ja-JP' };
+
+const I18N = {
+en: {
+  nav_home: 'Home', nav_add: 'Add', nav_history: 'History', nav_settings: 'Settings',
+  greeting_morning: 'Good morning', greeting_afternoon: 'Good afternoon', greeting_evening: 'Good evening',
+  open_profile: 'Open profile', available_to_spend: 'Available to Spend', income: 'Income', spent: 'Spent',
+  spending_breakdown_aria: 'View spending breakdown by category', due_now: 'Due Now', log: 'Log',
+  allocation: 'Allocation', total: 'Total', your_buckets: 'Your Buckets',
+  counted_as_spent: 'Counted as spent when added', goal_progress: '{bal} of {goal} goal',
+  delete_name_aria: 'Delete {name}',
+  seg_expense: 'Expense', seg_recurring: 'Recurring', amount: 'Amount', source: 'Source',
+  source_placeholder: 'e.g. Paycheck', date: 'Date', split_preview: 'Split Preview',
+  add_income_btn: 'Add Income', bucket: 'Bucket', note: 'Note', note_placeholder: 'e.g. Groceries',
+  log_expense_btn: 'Log Expense', available_colon: 'Available: {amt}', spent_tag: 'spent',
+  no_recurring_title: 'No recurring payments yet.',
+  no_recurring_sub: "Add a bill or subscription to get reminded when it's due.",
+  add_recurring_btn: '+ Add Recurring', freq_weekly: 'Weekly', freq_biweekly: 'Biweekly',
+  freq_monthly: 'Monthly', freq_yearly: 'Yearly', add_recurring_title: 'Add Recurring', name: 'Name',
+  name_placeholder: 'e.g. Netflix', repeats: 'Repeats', starting: 'Starting', due_now_short: 'Due now',
+  next_date: 'Next {date}', unknown_bucket: 'Unknown bucket', delete_name_q: 'Delete "{name}"?',
+  delete_recurring_text: 'This stops the reminder. Past transactions already logged from it stay in History.',
+  cancel: 'Cancel', delete: 'Delete', recurring_payment_default: 'Recurring Payment',
+  log_recur_aria: 'Log {name} now',
+  history_title: 'History', all: 'All', no_transactions_title: 'No transactions yet.',
+  no_transactions_sub: 'Add income or an expense to get started.', split_across: 'Split across {n} buckets',
+  settings_title: 'Settings', percent: 'Percent', goal: 'Goal', no_goal: 'No goal',
+  counts_toward_spent: 'Counts toward Spent when added', add_bucket_btn: '+ Add Bucket',
+  total_allocation: 'Total Allocation', save_changes: 'Save Changes', new_bucket_default: 'New Bucket',
+  decrease_percent_aria: 'Decrease {name} percent', increase_percent_aria: 'Increase {name} percent',
+  count_as_spent_aria: 'Count {name} as spent when added',
+  delete_bucket_text1: 'This removes the bucket and its percentage allocation.',
+  delete_bucket_holds: ' It currently holds {amt}, which will be permanently removed.',
+  delete_bucket_text2: ' Past transactions logged to it stay in History but will show as unassigned.',
+  of_every_deposit: '{pct}% of every deposit', counted_as_spent_suffix: ' · Counted as spent',
+  set_goal_placeholder: 'Set a goal amount', save: 'Save', recent_activity: 'Recent Activity',
+  no_activity_yet: 'No activity yet',
+  delete_entry_title: 'Delete Entry?',
+  delete_entry_text: 'This will remove the {desc} and reverse its effect on your bucket balances.',
+  income_of_from: 'income of {amt} from "{source}"', expense_of: 'expense of {amt} ("{note}")',
+  reset_title: 'Reset All Data?',
+  reset_text: 'This permanently deletes every bucket balance and transaction, and restores the default 55/5/10/15/15 split. This cannot be undone.',
+  reset: 'Reset',
+  profile_title: 'Profile', your_name: 'Your Name', add_your_name_placeholder: 'Add your name',
+  app_section: 'App', export_data: 'Export Data', import_data: 'Import Data', about_section: 'About',
+  app_desc: 'Splits every paycheck into buckets by percentage and tracks balances, goals, and spending against them.',
+  reset_all_data_btn: 'Reset All Data', couldnt_import_title: "Couldn't Import",
+  couldnt_import_text: "That file doesn't look like a valid Wealth Split backup.", ok: 'OK',
+  language_section: 'Language',
+  spending_breakdown_title: 'Spending Breakdown', total_spent: 'Total Spent', by_category: 'By Category',
+  recent_spending: 'Recent Spending', nothing_spent_yet: 'Nothing spent yet', close_aria: 'Close',
+},
+es: {
+  nav_home: 'Inicio', nav_add: 'Añadir', nav_history: 'Historial', nav_settings: 'Ajustes',
+  greeting_morning: 'Buenos días', greeting_afternoon: 'Buenas tardes', greeting_evening: 'Buenas noches',
+  open_profile: 'Abrir perfil', available_to_spend: 'Disponible para gastar', income: 'Ingresos', spent: 'Gastado',
+  spending_breakdown_aria: 'Ver desglose de gastos por categoría', due_now: 'Vence ahora', log: 'Registrar',
+  allocation: 'Distribución', total: 'Total', your_buckets: 'Tus categorías',
+  counted_as_spent: 'Se cuenta como gastado al añadirse', goal_progress: '{bal} de {goal} de meta',
+  delete_name_aria: 'Eliminar {name}',
+  seg_expense: 'Gasto', seg_recurring: 'Recurrente', amount: 'Monto', source: 'Origen',
+  source_placeholder: 'p. ej. Sueldo', date: 'Fecha', split_preview: 'Vista previa del reparto',
+  add_income_btn: 'Añadir ingreso', bucket: 'Categoría', note: 'Nota', note_placeholder: 'p. ej. Supermercado',
+  log_expense_btn: 'Registrar gasto', available_colon: 'Disponible: {amt}', spent_tag: 'gastado',
+  no_recurring_title: 'Aún no hay pagos recurrentes.',
+  no_recurring_sub: 'Añade una factura o suscripción para recibir recordatorios cuando venza.',
+  add_recurring_btn: '+ Añadir recurrente', freq_weekly: 'Semanal', freq_biweekly: 'Quincenal',
+  freq_monthly: 'Mensual', freq_yearly: 'Anual', add_recurring_title: 'Añadir recurrente', name: 'Nombre',
+  name_placeholder: 'p. ej. Netflix', repeats: 'Se repite', starting: 'Comienza', due_now_short: 'Vence ahora',
+  next_date: 'Próximo {date}', unknown_bucket: 'Categoría desconocida', delete_name_q: '¿Eliminar "{name}"?',
+  delete_recurring_text: 'Esto detiene el recordatorio. Las transacciones ya registradas se mantienen en el Historial.',
+  cancel: 'Cancelar', delete: 'Eliminar', recurring_payment_default: 'Pago recurrente',
+  log_recur_aria: 'Registrar {name} ahora',
+  history_title: 'Historial', all: 'Todo', no_transactions_title: 'Aún no hay transacciones.',
+  no_transactions_sub: 'Añade un ingreso o un gasto para empezar.', split_across: 'Repartido entre {n} categorías',
+  settings_title: 'Ajustes', percent: 'Porcentaje', goal: 'Meta', no_goal: 'Sin meta',
+  counts_toward_spent: 'Cuenta como gastado al añadirse', add_bucket_btn: '+ Añadir categoría',
+  total_allocation: 'Distribución total', save_changes: 'Guardar cambios', new_bucket_default: 'Nueva categoría',
+  decrease_percent_aria: 'Disminuir el porcentaje de {name}', increase_percent_aria: 'Aumentar el porcentaje de {name}',
+  count_as_spent_aria: 'Contar {name} como gastado al añadirse',
+  delete_bucket_text1: 'Esto elimina la categoría y su porcentaje asignado.',
+  delete_bucket_holds: ' Actualmente tiene {amt}, que se eliminará de forma permanente.',
+  delete_bucket_text2: ' Las transacciones ya registradas en ella permanecerán en el Historial, mostradas como sin asignar.',
+  of_every_deposit: '{pct}% de cada depósito', counted_as_spent_suffix: ' · Contado como gastado',
+  set_goal_placeholder: 'Define un monto de meta', save: 'Guardar', recent_activity: 'Actividad reciente',
+  no_activity_yet: 'Aún no hay actividad',
+  delete_entry_title: '¿Eliminar entrada?',
+  delete_entry_text: 'Esto eliminará {desc} y revertirá su efecto en los saldos de tus categorías.',
+  income_of_from: 'el ingreso de {amt} de "{source}"', expense_of: 'el gasto de {amt} ("{note}")',
+  reset_title: '¿Restablecer todos los datos?',
+  reset_text: 'Esto elimina permanentemente cada saldo y transacción, y restaura el reparto predeterminado 55/5/10/15/15. Esta acción no se puede deshacer.',
+  reset: 'Restablecer',
+  profile_title: 'Perfil', your_name: 'Tu nombre', add_your_name_placeholder: 'Añade tu nombre',
+  app_section: 'Aplicación', export_data: 'Exportar datos', import_data: 'Importar datos', about_section: 'Acerca de',
+  app_desc: 'Reparte cada sueldo en categorías por porcentaje y hace seguimiento de saldos, metas y gastos.',
+  reset_all_data_btn: 'Restablecer todos los datos', couldnt_import_title: 'No se pudo importar',
+  couldnt_import_text: 'Ese archivo no parece ser una copia de seguridad válida de Wealth Split.', ok: 'Aceptar',
+  language_section: 'Idioma',
+  spending_breakdown_title: 'Desglose de gastos', total_spent: 'Total gastado', by_category: 'Por categoría',
+  recent_spending: 'Gastos recientes', nothing_spent_yet: 'Aún no se ha gastado nada', close_aria: 'Cerrar',
+},
+pt: {
+  nav_home: 'Início', nav_add: 'Adicionar', nav_history: 'Histórico', nav_settings: 'Ajustes',
+  greeting_morning: 'Bom dia', greeting_afternoon: 'Boa tarde', greeting_evening: 'Boa noite',
+  open_profile: 'Abrir perfil', available_to_spend: 'Disponível para gastar', income: 'Renda', spent: 'Gasto',
+  spending_breakdown_aria: 'Ver detalhamento de gastos por categoria', due_now: 'Vencendo agora', log: 'Registrar',
+  allocation: 'Distribuição', total: 'Total', your_buckets: 'Suas categorias',
+  counted_as_spent: 'Contado como gasto ao ser adicionado', goal_progress: '{bal} de {goal} da meta',
+  delete_name_aria: 'Excluir {name}',
+  seg_expense: 'Gasto', seg_recurring: 'Recorrente', amount: 'Valor', source: 'Origem',
+  source_placeholder: 'ex.: Salário', date: 'Data', split_preview: 'Prévia da divisão',
+  add_income_btn: 'Adicionar renda', bucket: 'Categoria', note: 'Nota', note_placeholder: 'ex.: Mercado',
+  log_expense_btn: 'Registrar gasto', available_colon: 'Disponível: {amt}', spent_tag: 'gasto',
+  no_recurring_title: 'Ainda não há pagamentos recorrentes.',
+  no_recurring_sub: 'Adicione uma conta ou assinatura para ser lembrado quando ela vencer.',
+  add_recurring_btn: '+ Adicionar recorrente', freq_weekly: 'Semanal', freq_biweekly: 'Quinzenal',
+  freq_monthly: 'Mensal', freq_yearly: 'Anual', add_recurring_title: 'Adicionar recorrente', name: 'Nome',
+  name_placeholder: 'ex.: Netflix', repeats: 'Repete', starting: 'Início', due_now_short: 'Vence agora',
+  next_date: 'Próximo {date}', unknown_bucket: 'Categoria desconhecida', delete_name_q: 'Excluir "{name}"?',
+  delete_recurring_text: 'Isso interrompe o lembrete. As transações já registradas permanecem no Histórico.',
+  cancel: 'Cancelar', delete: 'Excluir', recurring_payment_default: 'Pagamento recorrente',
+  log_recur_aria: 'Registrar {name} agora',
+  history_title: 'Histórico', all: 'Tudo', no_transactions_title: 'Ainda não há transações.',
+  no_transactions_sub: 'Adicione uma renda ou um gasto para começar.', split_across: 'Dividido entre {n} categorias',
+  settings_title: 'Ajustes', percent: 'Porcentagem', goal: 'Meta', no_goal: 'Sem meta',
+  counts_toward_spent: 'Conta como gasto ao ser adicionado', add_bucket_btn: '+ Adicionar categoria',
+  total_allocation: 'Distribuição total', save_changes: 'Salvar alterações', new_bucket_default: 'Nova categoria',
+  decrease_percent_aria: 'Diminuir a porcentagem de {name}', increase_percent_aria: 'Aumentar a porcentagem de {name}',
+  count_as_spent_aria: 'Contar {name} como gasto ao ser adicionado',
+  delete_bucket_text1: 'Isso remove a categoria e sua porcentagem alocada.',
+  delete_bucket_holds: ' Ela contém atualmente {amt}, que será removido permanentemente.',
+  delete_bucket_text2: ' As transações já registradas nela permanecerão no Histórico, exibidas como não atribuídas.',
+  of_every_deposit: '{pct}% de cada depósito', counted_as_spent_suffix: ' · Contado como gasto',
+  set_goal_placeholder: 'Defina um valor de meta', save: 'Salvar', recent_activity: 'Atividade recente',
+  no_activity_yet: 'Ainda não há atividade',
+  delete_entry_title: 'Excluir lançamento?',
+  delete_entry_text: 'Isso removerá {desc} e reverterá seu efeito nos saldos das suas categorias.',
+  income_of_from: 'a renda de {amt} de "{source}"', expense_of: 'o gasto de {amt} ("{note}")',
+  reset_title: 'Redefinir todos os dados?',
+  reset_text: 'Isso exclui permanentemente todos os saldos e transações, e restaura a divisão padrão de 55/5/10/15/15. Esta ação não pode ser desfeita.',
+  reset: 'Redefinir',
+  profile_title: 'Perfil', your_name: 'Seu nome', add_your_name_placeholder: 'Adicione seu nome',
+  app_section: 'Aplicativo', export_data: 'Exportar dados', import_data: 'Importar dados', about_section: 'Sobre',
+  app_desc: 'Divide cada salário em categorias por porcentagem e acompanha saldos, metas e gastos.',
+  reset_all_data_btn: 'Redefinir todos os dados', couldnt_import_title: 'Não foi possível importar',
+  couldnt_import_text: 'Esse arquivo não parece ser um backup válido do Wealth Split.', ok: 'OK',
+  language_section: 'Idioma',
+  spending_breakdown_title: 'Detalhamento de gastos', total_spent: 'Total gasto', by_category: 'Por categoria',
+  recent_spending: 'Gastos recentes', nothing_spent_yet: 'Ainda não há gastos', close_aria: 'Fechar',
+},
+ko: {
+  nav_home: '홈', nav_add: '추가', nav_history: '내역', nav_settings: '설정',
+  greeting_morning: '좋은 아침이에요', greeting_afternoon: '좋은 오후예요', greeting_evening: '좋은 저녁이에요',
+  open_profile: '프로필 열기', available_to_spend: '사용 가능 금액', income: '수입', spent: '지출',
+  spending_breakdown_aria: '카테고리별 지출 내역 보기', due_now: '지금 결제 예정', log: '기록',
+  allocation: '배분', total: '총액', your_buckets: '내 카테고리',
+  counted_as_spent: '추가 시 지출로 계산됨', goal_progress: '{goal} 목표 중 {bal}',
+  delete_name_aria: '{name} 삭제',
+  seg_expense: '지출', seg_recurring: '정기 결제', amount: '금액', source: '출처',
+  source_placeholder: '예: 월급', date: '날짜', split_preview: '배분 미리보기',
+  add_income_btn: '수입 추가', bucket: '카테고리', note: '메모', note_placeholder: '예: 장보기',
+  log_expense_btn: '지출 기록', available_colon: '사용 가능: {amt}', spent_tag: '지출',
+  no_recurring_title: '아직 정기 결제가 없어요.',
+  no_recurring_sub: '청구서나 구독을 추가하면 결제일에 알려드려요.',
+  add_recurring_btn: '+ 정기 결제 추가', freq_weekly: '매주', freq_biweekly: '격주',
+  freq_monthly: '매월', freq_yearly: '매년', add_recurring_title: '정기 결제 추가', name: '이름',
+  name_placeholder: '예: 넷플릭스', repeats: '반복 주기', starting: '시작일', due_now_short: '지금 결제 예정',
+  next_date: '다음 {date}', unknown_bucket: '알 수 없는 카테고리', delete_name_q: '"{name}"을(를) 삭제할까요?',
+  delete_recurring_text: '알림이 중지됩니다. 이미 기록된 거래 내역은 내역 화면에 그대로 남아요.',
+  cancel: '취소', delete: '삭제', recurring_payment_default: '정기 결제',
+  log_recur_aria: '{name} 지금 기록',
+  history_title: '내역', all: '전체', no_transactions_title: '아직 거래 내역이 없어요.',
+  no_transactions_sub: '수입이나 지출을 추가해 시작해 보세요.', split_across: '{n}개 카테고리로 배분됨',
+  settings_title: '설정', percent: '비율', goal: '목표', no_goal: '목표 없음',
+  counts_toward_spent: '추가 시 지출로 계산됨', add_bucket_btn: '+ 카테고리 추가',
+  total_allocation: '총 배분 비율', save_changes: '변경 사항 저장', new_bucket_default: '새 카테고리',
+  decrease_percent_aria: '{name} 비율 줄이기', increase_percent_aria: '{name} 비율 늘리기',
+  count_as_spent_aria: '{name}을(를) 추가 시 지출로 계산',
+  delete_bucket_text1: '이 카테고리와 배분된 비율이 삭제됩니다.',
+  delete_bucket_holds: ' 현재 {amt}이(가) 들어 있으며, 영구적으로 삭제됩니다.',
+  delete_bucket_text2: ' 이미 기록된 거래 내역은 내역 화면에 남지만 미지정으로 표시됩니다.',
+  of_every_deposit: '입금액의 {pct}%', counted_as_spent_suffix: ' · 지출로 계산됨',
+  set_goal_placeholder: '목표 금액 설정', save: '저장', recent_activity: '최근 활동',
+  no_activity_yet: '아직 활동이 없어요',
+  delete_entry_title: '항목을 삭제할까요?',
+  delete_entry_text: '{desc}이(가) 삭제되고 카테고리 잔액에 반영된 내용이 취소됩니다.',
+  income_of_from: '"{source}"에서 온 {amt} 수입', expense_of: '{amt} 지출 ("{note}")',
+  reset_title: '모든 데이터를 초기화할까요?',
+  reset_text: '모든 카테고리 잔액과 거래 내역이 영구적으로 삭제되고 기본 55/5/10/15/15 배분으로 복원됩니다. 이 작업은 되돌릴 수 없습니다.',
+  reset: '초기화',
+  profile_title: '프로필', your_name: '이름', add_your_name_placeholder: '이름을 입력하세요',
+  app_section: '앱', export_data: '데이터 내보내기', import_data: '데이터 가져오기', about_section: '정보',
+  app_desc: '월급을 비율에 따라 카테고리로 나누고 잔액, 목표, 지출을 추적해요.',
+  reset_all_data_btn: '모든 데이터 초기화', couldnt_import_title: '가져오기 실패',
+  couldnt_import_text: '올바른 Wealth Split 백업 파일이 아닌 것 같아요.', ok: '확인',
+  language_section: '언어',
+  spending_breakdown_title: '지출 내역', total_spent: '총 지출', by_category: '카테고리별',
+  recent_spending: '최근 지출', nothing_spent_yet: '아직 지출 내역이 없어요', close_aria: '닫기',
+},
+ja: {
+  nav_home: 'ホーム', nav_add: '追加', nav_history: '履歴', nav_settings: '設定',
+  greeting_morning: 'おはようございます', greeting_afternoon: 'こんにちは', greeting_evening: 'こんばんは',
+  open_profile: 'プロフィールを開く', available_to_spend: '使える金額', income: '収入', spent: '支出',
+  spending_breakdown_aria: 'カテゴリ別の支出内訳を見る', due_now: '支払い期限', log: '記録',
+  allocation: '配分', total: '合計', your_buckets: 'カテゴリ一覧',
+  counted_as_spent: '追加時に支出として計上', goal_progress: '目標{goal}のうち{bal}',
+  delete_name_aria: '{name}を削除',
+  seg_expense: '支出', seg_recurring: '定期支払い', amount: '金額', source: '収入元',
+  source_placeholder: '例: 給料', date: '日付', split_preview: '配分プレビュー',
+  add_income_btn: '収入を追加', bucket: 'カテゴリ', note: 'メモ', note_placeholder: '例: 食料品',
+  log_expense_btn: '支出を記録', available_colon: '使える金額: {amt}', spent_tag: '支出',
+  no_recurring_title: 'まだ定期支払いがありません。',
+  no_recurring_sub: '請求書やサブスクを追加すると、期限をお知らせします。',
+  add_recurring_btn: '+ 定期支払いを追加', freq_weekly: '毎週', freq_biweekly: '隔週',
+  freq_monthly: '毎月', freq_yearly: '毎年', add_recurring_title: '定期支払いを追加', name: '名前',
+  name_placeholder: '例: Netflix', repeats: '繰り返し', starting: '開始日', due_now_short: '期限が来ています',
+  next_date: '次回 {date}', unknown_bucket: '不明なカテゴリ', delete_name_q: '"{name}"を削除しますか?',
+  delete_recurring_text: 'リマインダーが停止されます。すでに記録された取引は履歴に残ります。',
+  cancel: 'キャンセル', delete: '削除', recurring_payment_default: '定期支払い',
+  log_recur_aria: '{name}を今すぐ記録',
+  history_title: '履歴', all: 'すべて', no_transactions_title: 'まだ取引がありません。',
+  no_transactions_sub: '収入または支出を追加して始めましょう。', split_across: '{n}個のカテゴリに配分',
+  settings_title: '設定', percent: '割合', goal: '目標', no_goal: '目標なし',
+  counts_toward_spent: '追加時に支出として計上', add_bucket_btn: '+ カテゴリを追加',
+  total_allocation: '配分合計', save_changes: '変更を保存', new_bucket_default: '新しいカテゴリ',
+  decrease_percent_aria: '{name}の割合を減らす', increase_percent_aria: '{name}の割合を増やす',
+  count_as_spent_aria: '{name}を追加時に支出として計上',
+  delete_bucket_text1: 'このカテゴリとその配分割合が削除されます。',
+  delete_bucket_holds: ' 現在{amt}が入っており、完全に削除されます。',
+  delete_bucket_text2: ' すでに記録された取引は履歴に残りますが、未割り当てと表示されます。',
+  of_every_deposit: '入金額の{pct}%', counted_as_spent_suffix: ' ・支出として計上済み',
+  set_goal_placeholder: '目標金額を設定', save: '保存', recent_activity: '最近のアクティビティ',
+  no_activity_yet: 'まだアクティビティがありません',
+  delete_entry_title: 'この項目を削除しますか?',
+  delete_entry_text: '{desc}が削除され、カテゴリ残高への影響が取り消されます。',
+  income_of_from: '"{source}"からの収入 {amt}', expense_of: '支出 {amt}(「{note}」)',
+  reset_title: 'すべてのデータをリセットしますか?',
+  reset_text: 'すべてのカテゴリ残高と取引が完全に削除され、デフォルトの55/5/10/15/15配分に戻ります。この操作は取り消せません。',
+  reset: 'リセット',
+  profile_title: 'プロフィール', your_name: 'お名前', add_your_name_placeholder: 'お名前を入力',
+  app_section: 'アプリ', export_data: 'データをエクスポート', import_data: 'データをインポート', about_section: 'アプリについて',
+  app_desc: '毎回の給料を割合ごとにカテゴリへ配分し、残高・目標・支出を記録します。',
+  reset_all_data_btn: 'すべてのデータをリセット', couldnt_import_title: 'インポートできませんでした',
+  couldnt_import_text: 'このファイルは有効なWealth Splitのバックアップではないようです。', ok: 'OK',
+  language_section: '言語',
+  spending_breakdown_title: '支出の内訳', total_spent: '合計支出', by_category: 'カテゴリ別',
+  recent_spending: '最近の支出', nothing_spent_yet: 'まだ支出はありません', close_aria: '閉じる',
+},
+};
+
+function t(key, vars) {
+  const lang = (state && state.lang) || 'en';
+  let str = (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  if (vars) {
+    Object.keys(vars).forEach(k => { str = str.split('{' + k + '}').join(vars[k]); });
+  }
+  return str;
+}
+
 const DEFAULT_STATE = {
   buckets: [
     { id: 'essentials', name: 'Essentials',       color: 'gold',    icon: 'home',    pct: 55, balance: 0, goal: null, autoSpend: false },
@@ -482,6 +748,7 @@ const DEFAULT_STATE = {
   transactions: [],
   profile: { name: '' },
   recurring: [],
+  lang: 'en',
 };
 
 let state = load();
@@ -500,6 +767,7 @@ function load() {
     });
     if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
     if (!parsed.recurring) { parsed.recurring = []; migrated = true; }
+    if (!parsed.lang || !LOCALE_MAP[parsed.lang]) { parsed.lang = 'en'; migrated = true; }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
@@ -509,13 +777,21 @@ function save() {
   catch (e) { console.error('Wealth Split: failed to save data', e); }
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
-function fmt(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n); }
+function locale() { return LOCALE_MAP[state.lang] || 'en-US'; }
+function fmt(n) { return new Intl.NumberFormat(locale(), { style: 'currency', currency: 'USD' }).format(n); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
 function niceDate(d) {
   const dt = new Date(d + 'T00:00:00');
-  return dt.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  return dt.toLocaleDateString(locale(), { weekday: 'short', month: 'short', day: 'numeric' });
 }
 function bucket(id) { return state.buckets.find(b => b.id === id); }
+
+function applyI18n() {
+  document.documentElement.lang = state.lang || 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-aria]').forEach(el => { el.setAttribute('aria-label', t(el.dataset.i18nAria)); });
+}
 
 /* ── NAV ── */
 document.querySelectorAll('.tab').forEach(tab => {
@@ -537,7 +813,7 @@ function updateProfileUI() {
   const avatarBtn = document.getElementById('avatar-initial');
   if (avatarBtn) avatarBtn.innerHTML = initial || ICONS.user;
   const hour = new Date().getHours();
-  const period = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const period = t(hour < 12 ? 'greeting_morning' : hour < 18 ? 'greeting_afternoon' : 'greeting_evening');
   const greet = document.getElementById('home-greeting');
   if (greet) greet.textContent = name ? `${period}, ${name}` : period;
 }
@@ -585,34 +861,34 @@ function openSpendingBreakdown() {
           <div class="bucket-goal-bar" style="margin-top:6px"><div class="bucket-goal-fill" style="width:${pct}%;background:${c.solid}"></div></div>
         </div>
       </div>`;
-    }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>Nothing spent yet</p></div>`;
+    }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>${t('nothing_spent_yet')}</p></div>`;
 
   const itemRows = items.map(it => {
     const b = bucket(it.bucketId);
     const c = b ? COLORS[b.color] : COLORS.gold;
     return `<div class="hist-item" style="cursor:default">
       <div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
-      <div class="hist-info"><div class="hist-title">${it.note}</div><div class="hist-sub">${b ? b.name : 'Unknown bucket'} · ${niceDate(it.date)}</div></div>
+      <div class="hist-info"><div class="hist-title">${it.note}</div><div class="hist-sub">${b ? b.name : t('unknown_bucket')} · ${niceDate(it.date)}</div></div>
       <div class="hist-amt mono">${fmt(it.amount)}</div>
     </div>`;
   }).join('');
 
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Spending Breakdown</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>${t('spending_breakdown_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
     <div class="detail-balance">
       <div class="n mono">${fmt(total)}</div>
-      <div class="l">Total Spent</div>
+      <div class="l">${t('total_spent')}</div>
     </div>
-    <div class="section-title" style="padding:0 0 6px">By Category</div>
+    <div class="section-title" style="padding:0 0 6px">${t('by_category')}</div>
     <div class="spend-cat-list">${catRows}</div>
-    ${items.length ? `<div class="section-title" style="padding:16px 0 8px">Recent Spending</div><div class="mini-hist">${itemRows}</div>` : ''}
+    ${items.length ? `<div class="section-title" style="padding:16px 0 8px">${t('recent_spending')}</div><div class="mini-hist">${itemRows}</div>` : ''}
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
 }
 
 function renderHome() {
-  document.getElementById('home-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString(locale(), { weekday: 'long', month: 'long', day: 'numeric' });
   updateProfileUI();
   const total = state.buckets.reduce((s, b) => s + b.balance, 0);
   const totalIncome = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
@@ -634,9 +910,9 @@ function renderHome() {
     if (b.goal && b.goal > 0) {
       const pctFill = Math.min(100, (b.balance / b.goal) * 100);
       goalHtml = `<div class="bucket-goal-bar"><div class="bucket-goal-fill" style="width:${pctFill}%;background:${c.solid}"></div></div>
-        <div class="bucket-goal-txt">${fmt(b.balance)} of ${fmt(b.goal)} goal</div>`;
+        <div class="bucket-goal-txt">${t('goal_progress', { bal: fmt(b.balance), goal: fmt(b.goal) })}</div>`;
     }
-    const autoSpendHtml = b.autoSpend ? `<div class="bucket-goal-txt">Counted as spent when added</div>` : '';
+    const autoSpendHtml = b.autoSpend ? `<div class="bucket-goal-txt">${t('counted_as_spent')}</div>` : '';
     card.innerHTML = `
       <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
       <div class="bucket-info">
@@ -679,7 +955,7 @@ function renderDueBanner() {
         <div class="bucket-name">${r.name}</div>
         <div class="bucket-balance mono">${fmt(r.amount)}</div>
       </div>
-      <button class="btn-primary" style="width:auto;padding:10px 16px;margin:0" data-log-recur="${r.id}">Log</button>`;
+      <button class="btn-primary" style="width:auto;padding:10px 16px;margin:0" data-log-recur="${r.id}">${t('log')}</button>`;
     dueList.appendChild(card);
   });
   dueList.querySelectorAll('[data-log-recur]').forEach(el => {
@@ -763,14 +1039,14 @@ function renderIncomePreview() {
     const row = document.createElement('div');
     row.className = 'preview-row';
     row.innerHTML = `<div class="preview-dot" style="background:${c.solid}"></div>
-      <div class="pname">${b.name} <span style="color:var(--dim);font-weight:600">${b.pct}%</span>${b.autoSpend ? ' <span style="color:var(--dim);font-size:0.75em">· spent</span>' : ''}</div>
+      <div class="pname">${b.name} <span style="color:var(--dim);font-weight:600">${b.pct}%</span>${b.autoSpend ? ` <span style="color:var(--dim);font-size:0.75em">· ${t('spent_tag')}</span>` : ''}</div>
       <div class="pamt mono">${fmt(amt * b.pct / 100)}</div>`;
     box.appendChild(row);
   });
 }
 document.getElementById('inc-submit').addEventListener('click', () => {
   const amt = parseFloat(document.getElementById('inc-amount').value);
-  const source = document.getElementById('inc-source').value.trim() || 'Income';
+  const source = document.getElementById('inc-source').value.trim() || t('income');
   const date = document.getElementById('inc-date').value || todayStr();
   if (!amt || amt <= 0) return;
   const splits = state.buckets.map(b => ({ bucketId: b.id, amount: Math.round(amt * b.pct) / 100 }));
@@ -794,11 +1070,11 @@ function renderExpenseChips() {
     row.appendChild(chip);
   });
   const b = bucket(selectedExpenseBucket);
-  document.getElementById('exp-balance-hint').textContent = `Available: ${fmt(b.balance)}`;
+  document.getElementById('exp-balance-hint').textContent = t('available_colon', { amt: fmt(b.balance) });
 }
 document.getElementById('exp-submit').addEventListener('click', () => {
   const amt = parseFloat(document.getElementById('exp-amount').value);
-  const note = document.getElementById('exp-note').value.trim() || 'Expense';
+  const note = document.getElementById('exp-note').value.trim() || t('seg_expense');
   const date = document.getElementById('exp-date').value || todayStr();
   if (!amt || amt <= 0 || !selectedExpenseBucket) return;
   bucket(selectedExpenseBucket).balance -= amt;
@@ -808,7 +1084,8 @@ document.getElementById('exp-submit').addEventListener('click', () => {
 });
 
 /* ── RECURRING ── */
-const FREQ_LABELS = { weekly: 'Weekly', biweekly: 'Biweekly', monthly: 'Monthly', yearly: 'Yearly' };
+const FREQ_KEYS = ['weekly', 'biweekly', 'monthly', 'yearly'];
+function freqLabel(key) { return t('freq_' + key); }
 
 function advanceRecurDate(dateStr, freq) {
   const d = new Date(dateStr + 'T00:00:00');
@@ -834,7 +1111,7 @@ function renderRecurringList() {
   if (!list) return;
   list.innerHTML = '';
   if (state.recurring.length === 0) {
-    list.innerHTML = `<div class="empty-state">${ICONS.repeat}<p>No recurring payments yet.<br>Add a bill or subscription to get reminded when it's due.</p></div>`;
+    list.innerHTML = `<div class="empty-state">${ICONS.repeat}<p>${t('no_recurring_title')}<br>${t('no_recurring_sub')}</p></div>`;
     return;
   }
   const today = todayStr();
@@ -848,13 +1125,13 @@ function renderRecurringList() {
     card.innerHTML = `
       <div class="bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS.repeat}</div>
       <div class="bucket-info">
-        <div class="bucket-name-row"><span class="bucket-name">${r.name}</span><span class="bucket-pct">${FREQ_LABELS[r.frequency]}</span></div>
+        <div class="bucket-name-row"><span class="bucket-name">${r.name}</span><span class="bucket-pct">${freqLabel(r.frequency)}</span></div>
         <div class="bucket-balance mono">${fmt(r.amount)}</div>
-        <div class="bucket-goal-txt"${due ? ' style="color:var(--text);font-weight:700"' : ''}>${due ? 'Due now' : 'Next ' + niceDate(r.nextDate)} · ${b ? b.name : 'Unknown bucket'}</div>
+        <div class="bucket-goal-txt"${due ? ' style="color:var(--text);font-weight:700"' : ''}>${due ? t('due_now_short') : t('next_date', { date: niceDate(r.nextDate) })} · ${b ? b.name : t('unknown_bucket')}</div>
       </div>
       <div class="recur-actions">
-        <div class="icon-del-btn" data-log-recur="${r.id}" aria-label="Log ${r.name} now" role="button">${ICONS.check}</div>
-        <div class="icon-del-btn" data-del-recur="${r.id}" aria-label="Delete ${r.name}" role="button">${ICONS.trash}</div>
+        <div class="icon-del-btn" data-log-recur="${r.id}" aria-label="${t('log_recur_aria', { name: r.name })}" role="button">${ICONS.check}</div>
+        <div class="icon-del-btn" data-del-recur="${r.id}" aria-label="${t('delete_name_aria', { name: r.name })}" role="button">${ICONS.trash}</div>
       </div>`;
     list.appendChild(card);
   });
@@ -873,28 +1150,28 @@ function openAddRecurringSheet() {
   let selFreq = 'monthly';
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Add Recurring</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>${t('add_recurring_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
     <div class="field">
-      <label>Name</label>
-      <input type="text" id="recur-name" placeholder="e.g. Netflix">
+      <label>${t('name')}</label>
+      <input type="text" id="recur-name" placeholder="${t('name_placeholder')}">
     </div>
     <div class="field">
-      <label>Amount</label>
+      <label>${t('amount')}</label>
       <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="recur-amount"></div>
     </div>
     <div class="field">
-      <label>Bucket</label>
+      <label>${t('bucket')}</label>
       <div class="chip-row" id="recur-buckets"></div>
     </div>
     <div class="field">
-      <label>Repeats</label>
+      <label>${t('repeats')}</label>
       <div class="chip-row" id="recur-freq"></div>
     </div>
     <div class="field">
-      <label>Starting</label>
+      <label>${t('starting')}</label>
       <input type="date" id="recur-date">
     </div>
-    <button class="btn-primary" id="recur-submit" disabled>Add Recurring</button>
+    <button class="btn-primary" id="recur-submit" disabled>${t('add_recurring_title')}</button>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
   document.getElementById('recur-date').value = todayStr();
@@ -913,10 +1190,10 @@ function openAddRecurringSheet() {
   });
 
   const freqRow = document.getElementById('recur-freq');
-  Object.entries(FREQ_LABELS).forEach(([key, label]) => {
+  FREQ_KEYS.forEach(key => {
     const chip = document.createElement('div');
     chip.className = 'chip' + (key === selFreq ? ' active' : '');
-    chip.textContent = label;
+    chip.textContent = freqLabel(key);
     chip.addEventListener('click', () => {
       selFreq = key;
       [...freqRow.children].forEach(el => el.classList.remove('active'));
@@ -932,7 +1209,7 @@ function openAddRecurringSheet() {
   });
 
   submitBtn.addEventListener('click', () => {
-    const name = document.getElementById('recur-name').value.trim() || 'Recurring Payment';
+    const name = document.getElementById('recur-name').value.trim() || t('recurring_payment_default');
     const amount = parseFloat(amountInput.value);
     const date = document.getElementById('recur-date').value || todayStr();
     if (!(amount > 0)) return;
@@ -948,11 +1225,11 @@ function openDeleteRecurringConfirm(id) {
   if (!r) return;
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Delete "${r.name}"?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
-    <div class="confirm-text">This stops the reminder. Past transactions already logged from it stay in History.</div>
+    <div class="sheet-head"><h3>${t('delete_name_q', { name: r.name })}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_recurring_text')}</div>
     <div class="btn-row">
-      <button class="btn-primary btn-ghost" id="cancel-del-recur" style="flex:1">Cancel</button>
-      <button class="btn-primary btn-danger" id="confirm-del-recur" style="flex:1">Delete</button>
+      <button class="btn-primary btn-ghost" id="cancel-del-recur" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del-recur" style="flex:1">${t('delete')}</button>
     </div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
@@ -969,7 +1246,7 @@ function openDeleteRecurringConfirm(id) {
 function renderHistory() {
   const frow = document.getElementById('filter-row');
   frow.innerHTML = '';
-  const filters = [{ id: 'all', name: 'All' }, ...state.buckets.map(b => ({ id: b.id, name: b.name }))];
+  const filters = [{ id: 'all', name: t('all') }, ...state.buckets.map(b => ({ id: b.id, name: b.name }))];
   filters.forEach(f => {
     const chip = document.createElement('div');
     chip.className = 'filter-chip' + (currentHistFilter === f.id ? ' active' : '');
@@ -987,33 +1264,33 @@ function renderHistory() {
   items.sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
 
   if (items.length === 0) {
-    list.innerHTML = `<div class="empty-state">${ICONS.empty}<p>No transactions yet.<br>Add income or an expense to get started.</p></div>`;
+    list.innerHTML = `<div class="empty-state">${ICONS.empty}<p>${t('no_transactions_title')}<br>${t('no_transactions_sub')}</p></div>`;
     return;
   }
 
   let lastDate = null;
-  items.forEach(t => {
-    if (t.date !== lastDate) {
+  items.forEach(tx => {
+    if (tx.date !== lastDate) {
       const h = document.createElement('div');
       h.className = 'date-heading';
-      h.textContent = niceDate(t.date);
+      h.textContent = niceDate(tx.date);
       list.appendChild(h);
-      lastDate = t.date;
+      lastDate = tx.date;
     }
     const row = document.createElement('div');
     row.className = 'hist-item';
-    if (t.type === 'income') {
+    if (tx.type === 'income') {
       row.innerHTML = `<div class="hist-icon" style="background:var(--emerald-d);color:var(--emerald)">${ICONS.down}</div>
-        <div class="hist-info"><div class="hist-title">${t.source}</div><div class="hist-sub">Split across ${t.splits.length} buckets</div></div>
-        <div class="hist-amt val pos mono">+${fmt(t.amount)}</div>`;
+        <div class="hist-info"><div class="hist-title">${tx.source}</div><div class="hist-sub">${t('split_across', { n: tx.splits.length })}</div></div>
+        <div class="hist-amt val pos mono">+${fmt(tx.amount)}</div>`;
     } else {
-      const b = bucket(t.bucketId);
+      const b = bucket(tx.bucketId);
       const c = b ? COLORS[b.color] : COLORS.rose;
       row.innerHTML = `<div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
-        <div class="hist-info"><div class="hist-title">${t.note}</div><div class="hist-sub">${b ? b.name : 'Unknown bucket'}</div></div>
-        <div class="hist-amt val neg mono">-${fmt(t.amount)}</div>`;
+        <div class="hist-info"><div class="hist-title">${tx.note}</div><div class="hist-sub">${b ? b.name : t('unknown_bucket')}</div></div>
+        <div class="hist-amt val neg mono">-${fmt(tx.amount)}</div>`;
     }
-    row.addEventListener('click', () => openDeleteConfirm(t.id));
+    row.addEventListener('click', () => openDeleteConfirm(tx.id));
     list.appendChild(row);
   });
 }
@@ -1037,7 +1314,7 @@ function renderSettings() {
     const card = document.createElement('div');
     card.className = 'settings-card';
     const delBtn = state.buckets.length > 1
-      ? `<div class="icon-del-btn" data-del-bucket="${b.id}" aria-label="Delete ${b.name}" role="button">${ICONS.trash}</div>` : '';
+      ? `<div class="icon-del-btn" data-del-bucket="${b.id}" aria-label="${t('delete_name_aria', { name: b.name })}" role="button">${ICONS.trash}</div>` : '';
     card.innerHTML = `
       <div class="settings-card-head">
         <div class="settings-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
@@ -1045,28 +1322,28 @@ function renderSettings() {
         ${delBtn}
       </div>
       <div class="settings-row">
-        <label>Percent</label>
+        <label>${t('percent')}</label>
         <div class="stepper-row">
-          <div class="stepper-btn" data-step="-1" data-id="${b.id}" aria-label="Decrease ${b.name} percent" role="button">&minus;</div>
+          <div class="stepper-btn" data-step="-1" data-id="${b.id}" aria-label="${t('decrease_percent_aria', { name: b.name })}" role="button">&minus;</div>
           <input type="number" min="0" max="100" step="1" value="${b.pct}" data-field="pct" data-id="${b.id}">
-          <div class="stepper-btn" data-step="1" data-id="${b.id}" aria-label="Increase ${b.name} percent" role="button">+</div>
+          <div class="stepper-btn" data-step="1" data-id="${b.id}" aria-label="${t('increase_percent_aria', { name: b.name })}" role="button">+</div>
         </div>
       </div>
       <div class="settings-row">
-        <label>Goal</label>
-        <input type="number" min="0" step="1" placeholder="No goal" value="${b.goal || ''}" data-field="goal" data-id="${b.id}">
+        <label>${t('goal')}</label>
+        <input type="number" min="0" step="1" placeholder="${t('no_goal')}" value="${b.goal || ''}" data-field="goal" data-id="${b.id}">
       </div>
       <div class="settings-row">
-        <label>Spent</label>
-        <div class="toggle-switch ${b.autoSpend ? 'on' : ''}" data-autospend-toggle="${b.id}" role="button" aria-label="Count ${b.name} as spent when added"><div class="toggle-switch-knob"></div></div>
-        <span class="toggle-hint">Counts toward Spent when added</span>
+        <label>${t('spent')}</label>
+        <div class="toggle-switch ${b.autoSpend ? 'on' : ''}" data-autospend-toggle="${b.id}" role="button" aria-label="${t('count_as_spent_aria', { name: b.name })}"><div class="toggle-switch-knob"></div></div>
+        <span class="toggle-hint">${t('counts_toward_spent')}</span>
       </div>`;
     list.appendChild(card);
   });
 
   const addBucketBtn = document.createElement('button');
   addBucketBtn.className = 'btn-primary btn-ghost add-bucket-btn';
-  addBucketBtn.textContent = '+ Add Bucket';
+  addBucketBtn.textContent = t('add_bucket_btn');
   addBucketBtn.id = 'add-bucket-btn';
   list.appendChild(addBucketBtn);
 
@@ -1076,7 +1353,7 @@ function renderSettings() {
 
   const saveBtn = document.createElement('button');
   saveBtn.className = 'btn-primary';
-  saveBtn.textContent = 'Save Changes';
+  saveBtn.textContent = t('save_changes');
   saveBtn.id = 'settings-save';
   list.appendChild(saveBtn);
 
@@ -1087,7 +1364,7 @@ function renderSettings() {
     const bar = document.getElementById('pct-sum-bar');
     const ok = sum === 100;
     bar.className = 'pct-sum-bar ' + (ok ? 'ok' : 'bad');
-    bar.innerHTML = `<span class="pct-sum-label">${ok ? ICONS.check : ICONS.alert}Total Allocation</span><span>${sum}%</span>`;
+    bar.innerHTML = `<span class="pct-sum-label">${ok ? ICONS.check : ICONS.alert}${t('total_allocation')}</span><span>${sum}%</span>`;
     document.getElementById('settings-save').disabled = sum !== 100;
   }
   list.querySelectorAll('input[data-field="pct"]').forEach(i => i.addEventListener('input', updateSumBar));
@@ -1113,7 +1390,7 @@ function renderSettings() {
     const idx = state.buckets.length % COLOR_PALETTE.length;
     const color = COLOR_PALETTE[idx];
     const icon = ICON_PALETTE[idx];
-    state.buckets.push({ id: uid(), name: 'New Bucket', color, icon, pct: 0, balance: 0, goal: null, autoSpend: false });
+    state.buckets.push({ id: uid(), name: t('new_bucket_default'), color, icon, pct: 0, balance: 0, goal: null, autoSpend: false });
     save();
     renderSettings();
   });
@@ -1138,15 +1415,15 @@ function openDeleteBucketConfirm(id) {
   const b = bucket(id);
   if (!b || state.buckets.length <= 1) return;
   const balanceNote = b.balance !== 0
-    ? ` It currently holds ${fmt(b.balance)}, which will be permanently removed.`
+    ? t('delete_bucket_holds', { amt: fmt(b.balance) })
     : '';
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Delete "${b.name}"?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
-    <div class="confirm-text">This removes the bucket and its percentage allocation.${balanceNote} Past transactions logged to it stay in History but will show as unassigned.</div>
+    <div class="sheet-head"><h3>${t('delete_name_q', { name: b.name })}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_bucket_text1')}${balanceNote}${t('delete_bucket_text2')}</div>
     <div class="btn-row">
-      <button class="btn-primary btn-ghost" id="cancel-del-bucket" style="flex:1">Cancel</button>
-      <button class="btn-primary btn-danger" id="confirm-del-bucket" style="flex:1">Delete</button>
+      <button class="btn-primary btn-ghost" id="cancel-del-bucket" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del-bucket" style="flex:1">${t('delete')}</button>
     </div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
@@ -1205,36 +1482,36 @@ sheet.addEventListener('pointercancel', endSheetDrag);
 function openBucketDetail(id) {
   const b = bucket(id);
   const c = COLORS[b.color];
-  const related = state.transactions.filter(t => t.type === 'income' || t.bucketId === id)
+  const related = state.transactions.filter(tx => tx.type === 'income' || tx.bucketId === id)
     .sort((a, z) => (z.date + z.id).localeCompare(a.date + a.id)).slice(0, 8);
-  let histHtml = related.map(t => {
-    if (t.type === 'income') {
-      const split = t.splits.find(s => s.bucketId === id);
+  let histHtml = related.map(tx => {
+    if (tx.type === 'income') {
+      const split = tx.splits.find(s => s.bucketId === id);
       return `<div class="hist-item" style="cursor:default"><div class="hist-icon" style="background:var(--emerald-d);color:var(--emerald)">${ICONS.down}</div>
-        <div class="hist-info"><div class="hist-title">${t.source}</div><div class="hist-sub">${niceDate(t.date)}</div></div>
+        <div class="hist-info"><div class="hist-title">${tx.source}</div><div class="hist-sub">${niceDate(tx.date)}</div></div>
         <div class="hist-amt val pos mono">+${fmt(split ? split.amount : 0)}</div></div>`;
     }
     return `<div class="hist-item" style="cursor:default"><div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
-      <div class="hist-info"><div class="hist-title">${t.note}</div><div class="hist-sub">${niceDate(t.date)}</div></div>
-      <div class="hist-amt val neg mono">-${fmt(t.amount)}</div></div>`;
-  }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>No activity yet</p></div>`;
+      <div class="hist-info"><div class="hist-title">${tx.note}</div><div class="hist-sub">${niceDate(tx.date)}</div></div>
+      <div class="hist-amt val neg mono">-${fmt(tx.amount)}</div></div>`;
+  }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>${t('no_activity_yet')}</p></div>`;
 
   openSheet(`
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <h3>${b.name}</h3>
-      <div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div>
+      <div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div>
     </div>
     <div class="detail-balance">
       <div class="n mono" style="color:${c.solid}">${fmt(b.balance)}</div>
-      <div class="l">${b.pct}% of every deposit${b.autoSpend ? ' · Counted as spent' : ''}</div>
+      <div class="l">${t('of_every_deposit', { pct: b.pct })}${b.autoSpend ? t('counted_as_spent_suffix') : ''}</div>
     </div>
     <div class="goal-edit-row">
       <span style="color:var(--dim)">${ICONS.target}</span>
-      <input type="number" id="detail-goal" placeholder="Set a goal amount" value="${b.goal || ''}">
-      <button class="btn-primary" style="width:auto;padding:12px 16px;margin:0" id="detail-goal-save">Save</button>
+      <input type="number" id="detail-goal" placeholder="${t('set_goal_placeholder')}" value="${b.goal || ''}">
+      <button class="btn-primary" style="width:auto;padding:12px 16px;margin:0" id="detail-goal-save">${t('save')}</button>
     </div>
-    <div class="section-title" style="padding:0 0 8px">Recent Activity</div>
+    <div class="section-title" style="padding:0 0 8px">${t('recent_activity')}</div>
     <div class="mini-hist">${histHtml}</div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
@@ -1248,26 +1525,28 @@ function openBucketDetail(id) {
 }
 
 function openDeleteConfirm(txId) {
-  const t = state.transactions.find(x => x.id === txId);
-  if (!t) return;
-  const desc = t.type === 'income' ? `income of ${fmt(t.amount)} from "${t.source}"` : `expense of ${fmt(t.amount)} ("${t.note}")`;
+  const tx = state.transactions.find(x => x.id === txId);
+  if (!tx) return;
+  const desc = tx.type === 'income'
+    ? t('income_of_from', { amt: fmt(tx.amount), source: tx.source })
+    : t('expense_of', { amt: fmt(tx.amount), note: tx.note });
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Delete Entry?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
-    <div class="confirm-text">This will remove the ${desc} and reverse its effect on your bucket balances.</div>
+    <div class="sheet-head"><h3>${t('delete_entry_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('delete_entry_text', { desc })}</div>
     <div class="btn-row">
-      <button class="btn-primary btn-ghost" id="cancel-del" style="flex:1">Cancel</button>
-      <button class="btn-primary btn-danger" id="confirm-del" style="flex:1">Delete</button>
+      <button class="btn-primary btn-ghost" id="cancel-del" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-del" style="flex:1">${t('delete')}</button>
     </div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
   document.getElementById('cancel-del').addEventListener('click', closeSheet);
   document.getElementById('confirm-del').addEventListener('click', () => {
-    if (t.type === 'income') {
-      t.splits.forEach(s => { const b = bucket(s.bucketId); if (b) b.balance -= s.amount; });
+    if (tx.type === 'income') {
+      tx.splits.forEach(s => { const b = bucket(s.bucketId); if (b) b.balance -= s.amount; });
     } else {
-      const b = bucket(t.bucketId);
-      if (b) b.balance += t.amount;
+      const b = bucket(tx.bucketId);
+      if (b) b.balance += tx.amount;
     }
     state.transactions = state.transactions.filter(x => x.id !== txId);
     save();
@@ -1279,11 +1558,11 @@ function openDeleteConfirm(txId) {
 function openResetConfirm() {
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Reset All Data?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
-    <div class="confirm-text">This permanently deletes every bucket balance and transaction, and restores the default 55/5/10/15/15 split. This cannot be undone.</div>
+    <div class="sheet-head"><h3>${t('reset_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('reset_text')}</div>
     <div class="btn-row">
-      <button class="btn-primary btn-ghost" id="cancel-reset" style="flex:1">Cancel</button>
-      <button class="btn-primary btn-danger" id="confirm-reset" style="flex:1">Reset</button>
+      <button class="btn-primary btn-ghost" id="cancel-reset" style="flex:1">${t('cancel')}</button>
+      <button class="btn-primary btn-danger" id="confirm-reset" style="flex:1">${t('reset')}</button>
     </div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
@@ -1306,29 +1585,34 @@ document.getElementById('spent-stat-btn').addEventListener('keydown', e => {
 function openProfile() {
   const name = state.profile.name || '';
   const initial = name.trim() ? name.trim()[0].toUpperCase() : ICONS.user;
+  const langChips = LANGUAGES.map(l =>
+    `<div class="chip${l.code === (state.lang || 'en') ? ' active' : ''}" data-lang="${l.code}">${l.label}</div>`
+  ).join('');
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Profile</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>${t('profile_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
     <div class="profile-avatar-row">
       <div class="avatar-lg" id="profile-avatar-lg">${initial}</div>
       <div class="field" style="flex:1;margin-bottom:0">
-        <label>Your Name</label>
-        <input type="text" id="profile-name" placeholder="Add your name" value="${name}">
+        <label>${t('your_name')}</label>
+        <input type="text" id="profile-name" placeholder="${t('add_your_name_placeholder')}" value="${name}">
       </div>
     </div>
-    <div class="section-title" style="padding:0 0 8px">App</div>
+    <div class="section-title" style="padding:0 0 8px">${t('language_section')}</div>
+    <div class="chip-row" id="lang-chips">${langChips}</div>
+    <div class="section-title" style="padding:16px 0 8px">${t('app_section')}</div>
     <div class="profile-menu">
-      <div class="profile-menu-item" id="export-data-btn">${ICONS.download}Export Data<span class="chev">${ICONS.chev}</span></div>
-      <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}Import Data<span class="chev">${ICONS.chev}</span></div>
+      <div class="profile-menu-item" id="export-data-btn">${ICONS.download}${t('export_data')}<span class="chev">${ICONS.chev}</span></div>
+      <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}${t('import_data')}<span class="chev">${ICONS.chev}</span></div>
       <input type="file" id="import-file-input" accept="application/json" style="display:none">
     </div>
-    <div class="section-title" style="padding:16px 0 8px">About</div>
+    <div class="section-title" style="padding:16px 0 8px">${t('about_section')}</div>
     <div class="about-box">
       <div class="about-name">Wealth Split</div>
-      <div class="about-desc">Splits every paycheck into buckets by percentage and tracks balances, goals, and spending against them.</div>
+      <div class="about-desc">${t('app_desc')}</div>
     </div>
     <div class="danger-zone">
-      <button class="btn-primary btn-danger" id="profile-reset-btn">Reset All Data</button>
+      <button class="btn-primary btn-danger" id="profile-reset-btn">${t('reset_all_data_btn')}</button>
     </div>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
@@ -1338,6 +1622,16 @@ function openProfile() {
     updateProfileUI();
     const val = e.target.value.trim();
     document.getElementById('profile-avatar-lg').innerHTML = val ? val[0].toUpperCase() : ICONS.user;
+  });
+  document.getElementById('lang-chips').querySelectorAll('[data-lang]').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chip.dataset.lang === state.lang) return;
+      state.lang = chip.dataset.lang;
+      save();
+      applyI18n();
+      renderHome();
+      openProfile();
+    });
   });
   document.getElementById('export-data-btn').addEventListener('click', exportData);
   document.getElementById('import-data-btn').addEventListener('click', () => {
@@ -1373,6 +1667,7 @@ function handleImportFile(e) {
       if (!parsed.buckets || !parsed.transactions) throw new Error('bad format');
       if (!parsed.profile) parsed.profile = { name: '' };
       if (!parsed.recurring) parsed.recurring = [];
+      if (!parsed.lang || !LOCALE_MAP[parsed.lang]) parsed.lang = 'en';
       state = parsed;
       save();
       closeSheet();
@@ -1387,14 +1682,15 @@ function handleImportFile(e) {
 function openImportError() {
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Couldn't Import</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
-    <div class="confirm-text">That file doesn't look like a valid Wealth Split backup.</div>
-    <button class="btn-primary" id="import-error-ok">OK</button>
+    <div class="sheet-head"><h3>${t('couldnt_import_title')}</h3><div class="sheet-close" id="close-sheet" aria-label="${t('close_aria')}" role="button">${ICONS.close}</div></div>
+    <div class="confirm-text">${t('couldnt_import_text')}</div>
+    <button class="btn-primary" id="import-error-ok">${t('ok')}</button>
   `);
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
   document.getElementById('import-error-ok').addEventListener('click', closeSheet);
 }
 
+applyI18n();
 renderHome();
 
 if ('serviceWorker' in navigator) {

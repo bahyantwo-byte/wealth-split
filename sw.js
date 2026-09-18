@@ -1,4 +1,4 @@
-const CACHE = 'wealth-split-v1';
+const CACHE = 'wealth-split-v2';
 const ASSETS = [
   './',
   './index.html',

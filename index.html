@@ -116,6 +116,10 @@ body::before {
 .summary-stat .lbl { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 .summary-stat .lbl svg { width: 12px; height: 12px; flex-shrink: 0; }
 .summary-stat .val { font-size: 1.05rem; font-weight: 700; margin-top: 2px; }
+#spent-stat-btn { cursor: pointer; transition: transform .12s; }
+#spent-stat-btn:active { transform: scale(0.96); }
+.spend-cat-row { display: flex; align-items: center; gap: 12px; padding: 9px 0; }
+.spend-cat-list { display: flex; flex-direction: column; }
 .val.pos { color: var(--green); }
 .val.neg { color: var(--red); }
 
@@ -306,8 +310,11 @@ input:focus { border-color: var(--dim); }
           <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg>Income</div>
           <div class="val pos mono" id="summary-income">$0</div>
         </div>
-        <div class="summary-stat">
-          <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>Spent</div>
+        <div class="summary-stat" id="spent-stat-btn" role="button" tabindex="0" aria-label="View spending breakdown by category">
+          <div class="lbl" style="justify-content:space-between">
+            <span style="display:flex;align-items:center;gap:5px"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>Spent</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
           <div class="val neg mono" id="summary-spent">$0</div>
         </div>
       </div>
@@ -536,16 +543,72 @@ function updateProfileUI() {
 }
 
 function calcTotalSpent() {
-  return state.transactions.reduce((s, t) => {
-    if (t.type === 'expense') return s + t.amount;
-    if (t.type === 'income') {
-      return s + t.splits.reduce((ss, sp) => {
-        const sb = bucket(sp.bucketId);
-        return ss + (sb && sb.autoSpend ? sp.amount : 0);
-      }, 0);
+  return calcSpendingItems().reduce((s, it) => s + it.amount, 0);
+}
+
+function calcSpendingItems() {
+  const items = [];
+  state.transactions.forEach(t => {
+    if (t.type === 'expense') {
+      items.push({ date: t.date, note: t.note, bucketId: t.bucketId, amount: t.amount, sortKey: t.date + t.id });
+    } else if (t.type === 'income') {
+      t.splits.forEach(sp => {
+        const b = bucket(sp.bucketId);
+        if (b && b.autoSpend && sp.amount > 0) {
+          items.push({ date: t.date, note: `${t.source} → ${b.name}`, bucketId: sp.bucketId, amount: sp.amount, sortKey: t.date + t.id + sp.bucketId });
+        }
+      });
     }
-    return s;
-  }, 0);
+  });
+  items.sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+  return items;
+}
+
+function openSpendingBreakdown() {
+  const items = calcSpendingItems();
+  const total = items.reduce((s, it) => s + it.amount, 0);
+
+  const byBucket = {};
+  items.forEach(it => { byBucket[it.bucketId] = (byBucket[it.bucketId] || 0) + it.amount; });
+
+  const catRows = state.buckets
+    .map(b => ({ b, amt: byBucket[b.id] || 0 }))
+    .filter(x => x.amt > 0)
+    .sort((a, z) => z.amt - a.amt)
+    .map(({ b, amt }) => {
+      const c = COLORS[b.color];
+      const pct = total > 0 ? (amt / total) * 100 : 0;
+      return `<div class="spend-cat-row">
+        <div class="bucket-dot" style="width:34px;height:34px;border-radius:10px;background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;font-size:0.85rem;font-weight:700"><span>${b.name}</span><span class="mono">${fmt(amt)}</span></div>
+          <div class="bucket-goal-bar" style="margin-top:6px"><div class="bucket-goal-fill" style="width:${pct}%;background:${c.solid}"></div></div>
+        </div>
+      </div>`;
+    }).join('') || `<div class="empty-state" style="padding:20px">${ICONS.empty}<p>Nothing spent yet</p></div>`;
+
+  const itemRows = items.map(it => {
+    const b = bucket(it.bucketId);
+    const c = b ? COLORS[b.color] : COLORS.gold;
+    return `<div class="hist-item" style="cursor:default">
+      <div class="hist-icon" style="background:${c.dim};color:${c.solid}">${ICONS.up}</div>
+      <div class="hist-info"><div class="hist-title">${it.note}</div><div class="hist-sub">${b ? b.name : 'Unknown bucket'} · ${niceDate(it.date)}</div></div>
+      <div class="hist-amt mono">${fmt(it.amount)}</div>
+    </div>`;
+  }).join('');
+
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Spending Breakdown</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
+    <div class="detail-balance">
+      <div class="n mono">${fmt(total)}</div>
+      <div class="l">Total Spent</div>
+    </div>
+    <div class="section-title" style="padding:0 0 6px">By Category</div>
+    <div class="spend-cat-list">${catRows}</div>
+    ${items.length ? `<div class="section-title" style="padding:16px 0 8px">Recent Spending</div><div class="mini-hist">${itemRows}</div>` : ''}
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
 }
 
 function renderHome() {
@@ -1235,6 +1298,10 @@ function openResetConfirm() {
 
 /* ── PROFILE ── */
 document.getElementById('avatar-btn').addEventListener('click', openProfile);
+document.getElementById('spent-stat-btn').addEventListener('click', openSpendingBreakdown);
+document.getElementById('spent-stat-btn').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openSpendingBreakdown(); }
+});
 
 function openProfile() {
   const name = state.profile.name || '';

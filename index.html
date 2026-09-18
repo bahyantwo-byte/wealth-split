@@ -7,6 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wealth Split">
 <meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Split every paycheck into percentage-based buckets and track balances, goals, and spending against them.">
 <title>Wealth Split</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-512.png">
@@ -164,15 +165,17 @@ body::before {
 .amount-input-wrap input { border: none; background: transparent; outline: none; color: var(--text); font-size: 1.3rem; font-weight: 700; width: 100%; font-family: 'DM Mono', monospace; }
 input[type=text], input[type=date] {
   width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 13px 16px;
-  color: var(--text); font-size: 0.95rem; font-family: inherit; outline: none;
+  color: var(--text); font-size: 1rem; font-family: inherit; outline: none;
 }
 input[type=date] { color-scheme: dark; }
+input:focus { border-color: var(--dim); }
 .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .chip {
   padding: 10px 14px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border);
   font-size: 0.82rem; font-weight: 700; color: var(--dim); cursor: pointer; transition: all .15s;
 }
 .chip.active { border-color: var(--text); color: var(--text); background: var(--bg4); }
+.chip:active { transform: scale(0.95); }
 .preview-box { margin-top: 4px; border-radius: 16px; background: var(--bg2); border: 1px solid var(--border); overflow: hidden; }
 .preview-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
 .preview-row:last-child { border-bottom: none; }
@@ -192,8 +195,9 @@ input[type=date] { color-scheme: dark; }
 .history-top { padding: 22px 20px 12px; flex-shrink: 0; }
 .filter-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 20px 14px; flex-shrink: 0; }
 .filter-row::-webkit-scrollbar { display: none; }
-.filter-chip { flex-shrink: 0; padding: 8px 14px; border-radius: 20px; background: var(--bg2); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; color: var(--dim); cursor: pointer; white-space: nowrap; }
+.filter-chip { flex-shrink: 0; padding: 8px 14px; border-radius: 20px; background: var(--bg2); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; color: var(--dim); cursor: pointer; white-space: nowrap; transition: transform .12s; }
 .filter-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.filter-chip:active { transform: scale(0.95); }
 .hist-list { padding: 0 20px 30px; display: flex; flex-direction: column; gap: 10px; }
 .date-heading { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dim); margin: 10px 0 2px; }
 .hist-item { display: flex; align-items: center; gap: 12px; padding: 13px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); cursor: pointer; }
@@ -217,7 +221,7 @@ input[type=date] { color-scheme: dark; }
 .settings-card input[type=text] { padding: 9px 12px; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; }
 .settings-row { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .settings-row label { font-size: 0.72rem; color: var(--dim); font-weight: 600; width: 62px; flex-shrink: 0; }
-.settings-row input[type=number] { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-weight: 600; outline: none; text-align: center; }
+.settings-row input[type=number] { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; color: var(--text); font-family: 'DM Mono', monospace; font-weight: 600; font-size: 1rem; outline: none; text-align: center; }
 .stepper-row { display: flex; align-items: center; gap: 8px; flex: 1; }
 .stepper-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: var(--text); cursor: pointer; flex-shrink: 0; user-select: none; transition: transform .1s; }
 .stepper-btn:active { transform: scale(0.9); }
@@ -249,7 +253,10 @@ input[type=date] { color-scheme: dark; }
 .detail-balance .n { font-size: 2.1rem; font-weight: 800; }
 .detail-balance .l { font-size: 0.75rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
 .goal-edit-row { display: flex; gap: 8px; align-items: center; margin-bottom: 18px; }
-.goal-edit-row input { flex: 1; }
+.goal-edit-row input {
+  flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px;
+  color: var(--text); font-size: 1rem; font-family: 'DM Mono', monospace; font-weight: 600; outline: none;
+}
 .mini-hist { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
 .confirm-text { font-size: 0.92rem; color: var(--dim); margin-bottom: 18px; line-height: 1.5; }
 .btn-row { display: flex; gap: 10px; }
@@ -280,7 +287,7 @@ input[type=date] { color-scheme: dark; }
           <div class="home-eyebrow" id="home-date"></div>
           <div class="home-greeting" id="home-greeting"></div>
         </div>
-        <div class="avatar-btn" id="avatar-btn"><span id="avatar-initial"></span></div>
+        <div class="avatar-btn" id="avatar-btn" aria-label="Open profile" role="button"><span id="avatar-initial"></span></div>
       </div>
     </div>
     <div class="summary-card">
@@ -301,6 +308,7 @@ input[type=date] { color-scheme: dark; }
     <div class="pie-card">
       <div class="pie-chart-wrap">
         <svg viewBox="0 0 340 300" id="pie-svg">
+          <circle cx="170" cy="150" r="60" fill="none" stroke="var(--bg4)" stroke-width="26"></circle>
           <g id="pie-arcs" transform="rotate(-90 170 150)"></g>
           <g id="pie-leaders"></g>
         </svg>
@@ -326,7 +334,7 @@ input[type=date] { color-scheme: dark; }
     <div class="form-wrap" id="form-income">
       <div class="field">
         <label>Amount</label>
-        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" placeholder="0.00" id="inc-amount"></div>
+        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="inc-amount"></div>
       </div>
       <div class="field">
         <label>Source</label>
@@ -350,7 +358,7 @@ input[type=date] { color-scheme: dark; }
       </div>
       <div class="field">
         <label>Amount</label>
-        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" placeholder="0.00" id="exp-amount"></div>
+        <div class="amount-input-wrap"><span class="cur">$</span><input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="exp-amount"></div>
       </div>
       <div class="field">
         <label>Note</label>
@@ -470,7 +478,10 @@ function load() {
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
 }
-function save() { localStorage.setItem('wealthSplitData', JSON.stringify(state)); }
+function save() {
+  try { localStorage.setItem('wealthSplitData', JSON.stringify(state)); }
+  catch (e) { console.error('Wealth Split: failed to save data', e); }
+}
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 function fmt(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n); }
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -592,10 +603,20 @@ function renderAdd() {
   document.getElementById('inc-source').value = '';
   document.getElementById('exp-amount').value = '';
   document.getElementById('exp-note').value = '';
+  document.getElementById('inc-submit').disabled = true;
+  document.getElementById('exp-submit').disabled = true;
   renderIncomePreview();
   renderExpenseChips();
 }
-document.getElementById('inc-amount').addEventListener('input', renderIncomePreview);
+document.getElementById('inc-amount').addEventListener('input', () => {
+  renderIncomePreview();
+  const amt = parseFloat(document.getElementById('inc-amount').value);
+  document.getElementById('inc-submit').disabled = !(amt > 0);
+});
+document.getElementById('exp-amount').addEventListener('input', () => {
+  const amt = parseFloat(document.getElementById('exp-amount').value);
+  document.getElementById('exp-submit').disabled = !(amt > 0);
+});
 function renderIncomePreview() {
   const amt = parseFloat(document.getElementById('inc-amount').value) || 0;
   const box = document.getElementById('inc-preview');
@@ -721,7 +742,7 @@ function renderSettings() {
     const card = document.createElement('div');
     card.className = 'settings-card';
     const delBtn = state.buckets.length > 1
-      ? `<div class="icon-del-btn" data-del-bucket="${b.id}">${ICONS.trash}</div>` : '';
+      ? `<div class="icon-del-btn" data-del-bucket="${b.id}" aria-label="Delete ${b.name}" role="button">${ICONS.trash}</div>` : '';
     card.innerHTML = `
       <div class="settings-card-head">
         <div class="settings-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div>
@@ -731,9 +752,9 @@ function renderSettings() {
       <div class="settings-row">
         <label>Percent</label>
         <div class="stepper-row">
-          <div class="stepper-btn" data-step="-1" data-id="${b.id}">&minus;</div>
+          <div class="stepper-btn" data-step="-1" data-id="${b.id}" aria-label="Decrease ${b.name} percent" role="button">&minus;</div>
           <input type="number" min="0" max="100" step="1" value="${b.pct}" data-field="pct" data-id="${b.id}">
-          <div class="stepper-btn" data-step="1" data-id="${b.id}">+</div>
+          <div class="stepper-btn" data-step="1" data-id="${b.id}" aria-label="Increase ${b.name} percent" role="button">+</div>
         </div>
       </div>
       <div class="settings-row">
@@ -810,7 +831,7 @@ function openDeleteBucketConfirm(id) {
     : '';
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Delete "${b.name}"?</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>Delete "${b.name}"?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
     <div class="confirm-text">This removes the bucket and its percentage allocation.${balanceNote} Past transactions logged to it stay in History but will show as unassigned.</div>
     <div class="btn-row">
       <button class="btn-primary btn-ghost" id="cancel-del-bucket" style="flex:1">Cancel</button>
@@ -891,7 +912,7 @@ function openBucketDetail(id) {
     <div class="sheet-handle"></div>
     <div class="sheet-head">
       <h3>${b.name}</h3>
-      <div class="sheet-close" id="close-sheet">${ICONS.close}</div>
+      <div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div>
     </div>
     <div class="detail-balance">
       <div class="n mono" style="color:${c.solid}">${fmt(b.balance)}</div>
@@ -921,7 +942,7 @@ function openDeleteConfirm(txId) {
   const desc = t.type === 'income' ? `income of ${fmt(t.amount)} from "${t.source}"` : `expense of ${fmt(t.amount)} ("${t.note}")`;
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Delete Entry?</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>Delete Entry?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
     <div class="confirm-text">This will remove the ${desc} and reverse its effect on your bucket balances.</div>
     <div class="btn-row">
       <button class="btn-primary btn-ghost" id="cancel-del" style="flex:1">Cancel</button>
@@ -947,7 +968,7 @@ function openDeleteConfirm(txId) {
 function openResetConfirm() {
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Reset All Data?</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>Reset All Data?</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
     <div class="confirm-text">This permanently deletes every bucket balance and transaction, and restores the default 55/5/10/15/15 split. This cannot be undone.</div>
     <div class="btn-row">
       <button class="btn-primary btn-ghost" id="cancel-reset" style="flex:1">Cancel</button>
@@ -972,7 +993,7 @@ function openProfile() {
   const initial = name.trim() ? name.trim()[0].toUpperCase() : ICONS.user;
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Profile</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>Profile</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
     <div class="profile-avatar-row">
       <div class="avatar-lg" id="profile-avatar-lg">${initial}</div>
       <div class="field" style="flex:1;margin-bottom:0">
@@ -1050,7 +1071,7 @@ function handleImportFile(e) {
 function openImportError() {
   openSheet(`
     <div class="sheet-handle"></div>
-    <div class="sheet-head"><h3>Couldn't Import</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="sheet-head"><h3>Couldn't Import</h3><div class="sheet-close" id="close-sheet" aria-label="Close" role="button">${ICONS.close}</div></div>
     <div class="confirm-text">That file doesn't look like a valid Wealth Split backup.</div>
     <button class="btn-primary" id="import-error-ok">OK</button>
   `);
@@ -1059,6 +1080,12 @@ function openImportError() {
 }
 
 renderHome();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>

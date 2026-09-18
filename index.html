@@ -88,7 +88,16 @@ body::before {
 
 /* ── HOME ── */
 .home-top { padding: 22px 20px 14px; flex-shrink: 0; }
+.home-top-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .home-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); }
+.home-greeting { font-size: 1.25rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.01em; }
+.avatar-btn {
+  width: 40px; height: 40px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem;
+  color: var(--text); cursor: pointer; flex-shrink: 0; transition: transform .12s;
+}
+.avatar-btn:active { transform: scale(0.9); }
+.avatar-btn svg { width: 18px; height: 18px; color: var(--dim); }
 .summary-card {
   margin: 14px 20px 8px; padding: 22px 20px; border-radius: 22px;
   background: linear-gradient(155deg, var(--bg3), var(--bg2));
@@ -246,6 +255,18 @@ input[type=date] { color-scheme: dark; }
 .btn-row { display: flex; gap: 10px; }
 .btn-row .btn-primary { margin-top: 0; }
 .btn-ghost { background: var(--bg3); color: var(--text); }
+
+/* ── PROFILE ── */
+.profile-avatar-row { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.avatar-lg { width: 56px; height: 56px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.3rem; flex-shrink: 0; }
+.avatar-lg svg { width: 24px; height: 24px; color: var(--dim); }
+.profile-menu { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.profile-menu-item { display: flex; align-items: center; gap: 10px; padding: 13px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+.profile-menu-item svg { width: 18px; height: 18px; color: var(--dim); flex-shrink: 0; }
+.profile-menu-item .chev { margin-left: auto; }
+.about-box { padding: 14px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); }
+.about-name { font-weight: 800; font-size: 0.95rem; }
+.about-desc { font-size: 0.78rem; color: var(--dim); margin-top: 4px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -254,7 +275,13 @@ input[type=date] { color-scheme: dark; }
   <!-- HOME -->
   <div class="screen active" id="screen-home">
     <div class="home-top">
-      <div class="home-eyebrow" id="home-date"></div>
+      <div class="home-top-row">
+        <div>
+          <div class="home-eyebrow" id="home-date"></div>
+          <div class="home-greeting" id="home-greeting"></div>
+        </div>
+        <div class="avatar-btn" id="avatar-btn"><span id="avatar-initial"></span></div>
+      </div>
     </div>
     <div class="summary-card">
       <div class="summary-label">Total Across Buckets</div>
@@ -392,7 +419,10 @@ const ICONS = {
   briefcase: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>',
   anchor: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>',
   check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+  alert: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  user: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  download: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  upload: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 };
 
 const COLORS = {
@@ -419,6 +449,7 @@ const DEFAULT_STATE = {
     { id: 'longterm',   name: 'Long-Term Wealth',  color: 'emerald', icon: 'award',   pct: 15, balance: 0, goal: null },
   ],
   transactions: [],
+  profile: { name: '' },
 };
 
 let state = load();
@@ -434,6 +465,7 @@ function load() {
     parsed.buckets.forEach((b, i) => {
       if (!b.icon || !ICONS[b.icon]) { b.icon = ICON_PALETTE[i % ICON_PALETTE.length]; migrated = true; }
     });
+    if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
@@ -462,8 +494,20 @@ function switchTab(name) {
 }
 
 /* ── HOME ── */
+function updateProfileUI() {
+  const name = (state.profile.name || '').trim();
+  const initial = name ? name[0].toUpperCase() : '';
+  const avatarBtn = document.getElementById('avatar-initial');
+  if (avatarBtn) avatarBtn.innerHTML = initial || ICONS.user;
+  const hour = new Date().getHours();
+  const period = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  const greet = document.getElementById('home-greeting');
+  if (greet) greet.textContent = name ? `${period}, ${name}` : period;
+}
+
 function renderHome() {
   document.getElementById('home-date').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  updateProfileUI();
   const total = state.buckets.reduce((s, b) => s + b.balance, 0);
   const totalIncome = state.transactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const totalSpent = state.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
@@ -715,11 +759,6 @@ function renderSettings() {
   saveBtn.id = 'settings-save';
   list.appendChild(saveBtn);
 
-  const danger = document.createElement('div');
-  danger.className = 'danger-zone';
-  danger.innerHTML = `<button class="btn-primary btn-danger" id="reset-data-btn">Reset All Data</button>`;
-  list.appendChild(danger);
-
   function updateSumBar() {
     const inputs = list.querySelectorAll('input[data-field="pct"]');
     let sum = 0;
@@ -761,8 +800,6 @@ function renderSettings() {
   list.querySelectorAll('[data-del-bucket]').forEach(el => {
     el.addEventListener('click', () => openDeleteBucketConfirm(el.dataset.delBucket));
   });
-
-  document.getElementById('reset-data-btn').addEventListener('click', openResetConfirm);
 }
 
 function openDeleteBucketConfirm(id) {
@@ -892,6 +929,100 @@ function openResetConfirm() {
     closeSheet();
     switchTab('home');
   });
+}
+
+/* ── PROFILE ── */
+document.getElementById('avatar-btn').addEventListener('click', openProfile);
+
+function openProfile() {
+  const name = state.profile.name || '';
+  const initial = name.trim() ? name.trim()[0].toUpperCase() : ICONS.user;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Profile</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="profile-avatar-row">
+      <div class="avatar-lg" id="profile-avatar-lg">${initial}</div>
+      <div class="field" style="flex:1;margin-bottom:0">
+        <label>Your Name</label>
+        <input type="text" id="profile-name" placeholder="Add your name" value="${name}">
+      </div>
+    </div>
+    <div class="section-title" style="padding:0 0 8px">App</div>
+    <div class="profile-menu">
+      <div class="profile-menu-item" id="export-data-btn">${ICONS.download}Export Data<span class="chev">${ICONS.chev}</span></div>
+      <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}Import Data<span class="chev">${ICONS.chev}</span></div>
+      <input type="file" id="import-file-input" accept="application/json" style="display:none">
+    </div>
+    <div class="section-title" style="padding:16px 0 8px">About</div>
+    <div class="about-box">
+      <div class="about-name">Wealth Split</div>
+      <div class="about-desc">Splits every paycheck into buckets by percentage and tracks balances, goals, and spending against them.</div>
+    </div>
+    <div class="danger-zone">
+      <button class="btn-primary btn-danger" id="profile-reset-btn">Reset All Data</button>
+    </div>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('profile-name').addEventListener('input', e => {
+    state.profile.name = e.target.value;
+    save();
+    updateProfileUI();
+    const val = e.target.value.trim();
+    document.getElementById('profile-avatar-lg').innerHTML = val ? val[0].toUpperCase() : ICONS.user;
+  });
+  document.getElementById('export-data-btn').addEventListener('click', exportData);
+  document.getElementById('import-data-btn').addEventListener('click', () => {
+    document.getElementById('import-file-input').click();
+  });
+  document.getElementById('import-file-input').addEventListener('change', handleImportFile);
+  document.getElementById('profile-reset-btn').addEventListener('click', () => {
+    closeSheet();
+    openResetConfirm();
+  });
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wealth-split-backup-${todayStr()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function handleImportFile(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      if (!parsed.buckets || !parsed.transactions) throw new Error('bad format');
+      if (!parsed.profile) parsed.profile = { name: '' };
+      state = parsed;
+      save();
+      closeSheet();
+      switchTab('home');
+    } catch (err) {
+      openImportError();
+    }
+  };
+  reader.readAsText(file);
+}
+
+function openImportError() {
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Couldn't Import</h3><div class="sheet-close" id="close-sheet">${ICONS.close}</div></div>
+    <div class="confirm-text">That file doesn't look like a valid Wealth Split backup.</div>
+    <button class="btn-primary" id="import-error-ok">OK</button>
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('import-error-ok').addEventListener('click', closeSheet);
 }
 
 renderHome();

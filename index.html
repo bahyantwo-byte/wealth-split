@@ -287,6 +287,36 @@ input:focus { border-color: var(--dim); }
 .about-name { font-weight: 800; font-size: 0.95rem; }
 .about-desc { font-size: 0.78rem; color: var(--dim); margin-top: 4px; line-height: 1.4; }
 
+/* ── ONBOARDING ── */
+#onboarding { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: flex; flex-direction: column; padding: calc(var(--safe-top) + 28px) 24px calc(var(--safe-bottom) + 28px); }
+#onboarding.hidden { display: none; }
+.ob-progress { display: flex; gap: 6px; justify-content: center; margin-bottom: 44px; }
+.ob-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--bg4); transition: all 0.3s ease; }
+.ob-dot.active { width: 22px; background: var(--text); }
+.ob-step { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.ob-emoji { font-size: 3.2rem; margin-bottom: 18px; }
+.ob-title { font-size: 1.7rem; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+.ob-sub { font-size: 0.92rem; color: var(--dim); line-height: 1.55; margin-bottom: 24px; }
+.ob-options { display: flex; flex-direction: column; gap: 9px; flex: 1; overflow-y: auto; padding-bottom: 4px; }
+.ob-option { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 16px; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+.ob-option.selected { border-color: var(--text); background: var(--bg3); }
+.ob-option-emoji { font-size: 1.4rem; width: 36px; text-align: center; flex-shrink: 0; }
+.ob-option-label { font-weight: 700; font-size: 0.9rem; }
+.ob-option-sub { font-size: 0.75rem; color: var(--dim); margin-top: 2px; }
+.ob-name-input { font-size: 1.4rem; font-weight: 700; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 16px; padding: 18px 20px; color: var(--text); outline: none; width: 100%; -webkit-appearance: none; }
+.ob-name-input:focus { border-color: oklch(70% 0 0); }
+.ob-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; }
+.ob-btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; letter-spacing: -0.01em; }
+.ob-btn-primary { background: var(--text); color: var(--bg); }
+.ob-btn-primary:disabled { opacity: 0.3; cursor: default; }
+.ob-btn-skip { background: none; color: var(--dim); font-size: 0.85rem; padding: 8px; }
+.ob-bucket-preview { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
+.ob-bucket-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); }
+.ob-bucket-dot { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ob-bucket-dot svg { width: 16px; height: 16px; }
+.ob-bucket-name { font-weight: 700; font-size: 0.9rem; flex: 1; }
+.ob-bucket-pct { font-family: 'DM Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--dim); }
+
 /* ── QUICK ADD ── */
 .qa-toggle { display: flex; background: var(--bg3); border-radius: 12px; padding: 3px; margin-bottom: 16px; }
 .qa-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; color: var(--dim); transition: all 0.18s; }
@@ -297,6 +327,12 @@ input:focus { border-color: var(--dim); }
 </style>
 </head>
 <body>
+
+<div id="onboarding">
+  <div class="ob-progress" id="ob-progress"></div>
+  <div class="ob-step" id="ob-step-content"></div>
+</div>
+
 <div class="app">
 
   <!-- HOME -->
@@ -1789,6 +1825,197 @@ function openQuickAdd(prefillType) {
     renderHome();
   });
 }
+
+/* ── ONBOARDING ── */
+(function() {
+  const alreadyOnboarded = localStorage.getItem('ws_onboarded');
+  if (alreadyOnboarded && state.profile && state.profile.name) {
+    document.getElementById('onboarding').classList.add('hidden');
+    return;
+  }
+
+  let obStep = 0, obName = '', obGoals = [], obStruggles = [];
+  const obEl = document.getElementById('onboarding');
+  const progressEl = document.getElementById('ob-progress');
+  const stepEl = document.getElementById('ob-step-content');
+
+  const GOALS = [
+    { id: 'save',      emoji: '💰', label: 'Save more money',       sub: 'Build savings every paycheck' },
+    { id: 'debt',      emoji: '📉', label: 'Pay off debt',           sub: 'Chip away at what I owe' },
+    { id: 'stop',      emoji: '🛑', label: 'Stop overspending',      sub: 'Know where every dollar goes' },
+    { id: 'emergency', emoji: '🏖️', label: 'Build emergency fund',   sub: '3–6 months of expenses' },
+    { id: 'invest',    emoji: '📈', label: 'Start investing',         sub: 'Make my money work for me' },
+  ];
+  const STRUGGLES = [
+    { id: 'food',          emoji: '🍔', label: 'Food & drinks',    sub: 'Eating out, delivery, coffee' },
+    { id: 'entertainment', emoji: '🎮', label: 'Entertainment',    sub: 'Streaming, gaming, movies' },
+    { id: 'shopping',      emoji: '🛍️', label: 'Shopping',         sub: 'Clothes, tech, impulse buys' },
+    { id: 'subscriptions', emoji: '📱', label: 'Subscriptions',    sub: 'Apps and services I forgot' },
+    { id: 'going_out',     emoji: '🌙', label: 'Going out',        sub: 'Bars, clubs, nightlife' },
+  ];
+
+  function renderProgress() {
+    progressEl.innerHTML = '';
+    const total = 4;
+    for (let i = 0; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = 'ob-dot' + (i === Math.max(0, obStep - 1) ? ' active' : '');
+      progressEl.appendChild(d);
+    }
+  }
+
+  function renderStep() {
+    renderProgress();
+    stepEl.innerHTML = '';
+    if (obStep === 0) renderWelcome();
+    else if (obStep === 1) renderName();
+    else if (obStep === 2) renderGoals();
+    else if (obStep === 3) renderStruggles();
+    else renderBucketPreview();
+  }
+
+  function renderWelcome() {
+    stepEl.innerHTML = `
+      <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+        <div class="ob-emoji">💸</div>
+        <div class="ob-title">Every dollar deserves a job.</div>
+        <div class="ob-sub">Wealth Split helps you split every paycheck on purpose — so money stops slipping through the cracks.</div>
+      </div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next">Get Started</button>
+      </div>`;
+    document.getElementById('ob-next').onclick = () => { obStep = 1; renderStep(); };
+  }
+
+  function renderName() {
+    stepEl.innerHTML = `
+      <div class="ob-title">What's your name?</div>
+      <div class="ob-sub">We'll personalize your experience.</div>
+      <input class="ob-name-input" id="ob-name-input" type="text" placeholder="Your first name" maxlength="30" autocomplete="off" value="${obName}">
+      <div style="flex:1"></div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next" ${!obName ? 'disabled' : ''}>Continue</button>
+        <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
+      </div>`;
+    const inp = document.getElementById('ob-name-input');
+    const btn = document.getElementById('ob-next');
+    inp.focus();
+    inp.oninput = () => { obName = inp.value.trim(); btn.disabled = !obName; };
+    btn.onclick = () => { obStep = 2; renderStep(); };
+    document.getElementById('ob-skip').onclick = () => { obName = ''; obStep = 2; renderStep(); };
+  }
+
+  function renderGoals() {
+    stepEl.innerHTML = `
+      <div class="ob-title">What's your goal?</div>
+      <div class="ob-sub">Pick all that apply — we'll build your buckets around this.</div>
+      <div class="ob-options" id="ob-list"></div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next">Continue</button>
+        <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
+      </div>`;
+    const list = document.getElementById('ob-list');
+    GOALS.forEach(g => {
+      const el = document.createElement('div');
+      el.className = 'ob-option' + (obGoals.includes(g.id) ? ' selected' : '');
+      el.innerHTML = `<div class="ob-option-emoji">${g.emoji}</div><div><div class="ob-option-label">${g.label}</div><div class="ob-option-sub">${g.sub}</div></div>`;
+      el.onclick = () => {
+        obGoals = obGoals.includes(g.id) ? obGoals.filter(x => x !== g.id) : [...obGoals, g.id];
+        el.classList.toggle('selected', obGoals.includes(g.id));
+      };
+      list.appendChild(el);
+    });
+    document.getElementById('ob-next').onclick = () => { obStep = 3; renderStep(); };
+    document.getElementById('ob-skip').onclick = () => { obGoals = []; obStep = 3; renderStep(); };
+  }
+
+  function renderStruggles() {
+    stepEl.innerHTML = `
+      <div class="ob-title">Where does it slip?</div>
+      <div class="ob-sub">No judgment — these areas get their own dedicated bucket so you can actually track them.</div>
+      <div class="ob-options" id="ob-list"></div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next">See My Setup</button>
+        <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
+      </div>`;
+    const list = document.getElementById('ob-list');
+    STRUGGLES.forEach(s => {
+      const el = document.createElement('div');
+      el.className = 'ob-option' + (obStruggles.includes(s.id) ? ' selected' : '');
+      el.innerHTML = `<div class="ob-option-emoji">${s.emoji}</div><div><div class="ob-option-label">${s.label}</div><div class="ob-option-sub">${s.sub}</div></div>`;
+      el.onclick = () => {
+        obStruggles = obStruggles.includes(s.id) ? obStruggles.filter(x => x !== s.id) : [...obStruggles, s.id];
+        el.classList.toggle('selected', obStruggles.includes(s.id));
+      };
+      list.appendChild(el);
+    });
+    document.getElementById('ob-next').onclick = () => { obStep = 4; renderStep(); };
+    document.getElementById('ob-skip').onclick = () => { obStruggles = []; obStep = 4; renderStep(); };
+  }
+
+  function buildBuckets() {
+    const buckets = [];
+    let rem = 100;
+    const add = (name, color, icon, pct, autoSpend) => {
+      buckets.push({ id: uid(), name, color, icon, pct, balance: 0, goal: null, autoSpend: !!autoSpend });
+      rem -= pct;
+    };
+    add('Essentials', 'gold', 'home', 50, false);
+    if (obGoals.includes('debt') && rem >= 15) add('Debt Payoff', 'rose', 'anchor', 15, true);
+    if (obGoals.includes('invest') && rem >= 10) add('Invest', 'emerald', 'trendUp', 10, false);
+    const savePct = Math.min((obGoals.includes('save') || obGoals.includes('emergency')) ? 20 : 10, rem - 10);
+    if (savePct >= 5) add(obGoals.includes('emergency') ? 'Emergency Fund' : 'Savings', 'sky', 'flag', savePct, false);
+    const strugMap = [
+      { id: 'food',          name: 'Food & Drinks',  color: 'orange', icon: 'heart',    pct: 10 },
+      { id: 'entertainment', name: 'Entertainment',  color: 'violet', icon: 'star',     pct: 8 },
+      { id: 'shopping',      name: 'Shopping',       color: 'pink',   icon: 'gift',     pct: 8 },
+      { id: 'subscriptions', name: 'Subscriptions',  color: 'cyan',   icon: 'repeat',   pct: 5 },
+      { id: 'going_out',     name: 'Going Out',      color: 'amber',  icon: 'compass',  pct: 8 },
+    ];
+    strugMap.forEach(s => {
+      if (obStruggles.includes(s.id) && rem >= s.pct + 2) add(s.name, s.color, s.icon, s.pct, true);
+    });
+    if (rem > 0) add('Extras', 'lime', 'award', rem, false);
+    return buckets;
+  }
+
+  function renderBucketPreview() {
+    const generated = buildBuckets();
+    const greeting = obName ? `You're all set, ${obName} 🎯` : 'Your setup is ready 🎯';
+    stepEl.innerHTML = `
+      <div class="ob-title" style="font-size:1.45rem">${greeting}</div>
+      <div class="ob-sub">Here's your personalized bucket breakdown. You can always edit it in Settings.</div>
+      <div class="ob-bucket-preview" id="ob-buckets"></div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-finish">Let's Go</button>
+      </div>`;
+    const list = document.getElementById('ob-buckets');
+    generated.forEach(b => {
+      const c = COLORS[b.color];
+      const row = document.createElement('div');
+      row.className = 'ob-bucket-row';
+      row.innerHTML = `<div class="ob-bucket-dot" style="background:${c.dim};color:${c.solid}">${ICONS[b.icon] || ICONS.home}</div><div class="ob-bucket-name">${b.name}</div><div class="ob-bucket-pct">${b.pct}%</div>`;
+      list.appendChild(row);
+    });
+    document.getElementById('ob-finish').onclick = () => {
+      if (obName) state.profile.name = obName;
+      state.buckets = generated;
+      save();
+      localStorage.setItem('ws_onboarded', '1');
+      obEl.style.transition = 'opacity 0.4s, transform 0.4s';
+      obEl.style.opacity = '0';
+      obEl.style.transform = 'scale(0.97)';
+      setTimeout(() => {
+        obEl.classList.add('hidden');
+        obEl.style.cssText = '';
+        renderHome();
+        updateProfileUI();
+      }, 400);
+    };
+  }
+
+  renderStep();
+})();
 
 /* ── CAPACITOR URL SCHEME: wealthsplit://quick-add?type=expense ── */
 try {

@@ -49,26 +49,24 @@ jobs:
           sed -i "s|__SHORTCUT_URL__|${SHORTCUT_URL}|g" www/index.html
           echo "Credentials and shortcut URL injected."
 
-      - name: Generate QuickSpend shortcut
+      - name: Generate and commit QuickSpend shortcut
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
-          mkdir -p pages
+          mkdir -p docs
           python3 scripts/generate_shortcut.py \
             "${SUPABASE_URL}" \
             "${SUPABASE_ANON_KEY}" \
-            "pages/QuickSpend.shortcut.xml"
-          plutil -convert binary1 -o "pages/QuickSpend.shortcut" "pages/QuickSpend.shortcut.xml"
-          echo "Shortcut generated."
-
-      - name: Deploy shortcut to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./pages
-          keep_files: false
-          commit_message: "Update QuickSpend shortcut"
+            "docs/QuickSpend.shortcut.xml"
+          plutil -convert binary1 -o "docs/QuickSpend.shortcut" "docs/QuickSpend.shortcut.xml"
+          rm docs/QuickSpend.shortcut.xml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/QuickSpend.shortcut
+          git diff --staged --quiet || git commit -m "Update QuickSpend shortcut [skip ci]"
+          git push
+          echo "Shortcut committed to docs/"
 
       - name: Add iOS platform
         run: npx cap add ios

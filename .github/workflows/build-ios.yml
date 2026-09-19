@@ -44,10 +44,15 @@ jobs:
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
           SHORTCUT_URL="https://${OWNER}.github.io/${REPO}/QuickSpend.shortcut"
-          sed -i "s|__SUPABASE_URL__|${SUPABASE_URL}|g" www/index.html
-          sed -i "s|__SUPABASE_ANON_KEY__|${SUPABASE_ANON_KEY}|g" www/index.html
-          sed -i "s|__SHORTCUT_URL__|${SHORTCUT_URL}|g" www/index.html
-          echo "Credentials and shortcut URL injected."
+          python3 -c "
+import sys
+with open('www/index.html') as f: c = f.read()
+c = c.replace('__SUPABASE_URL__', sys.argv[1])
+c = c.replace('__SUPABASE_ANON_KEY__', sys.argv[2])
+c = c.replace('__SHORTCUT_URL__', sys.argv[3])
+with open('www/index.html', 'w') as f: f.write(c)
+print('Credentials injected.')
+" "${SUPABASE_URL}" "${SUPABASE_ANON_KEY}" "${SHORTCUT_URL}"
 
       - name: Generate and commit QuickSpend shortcut
         env:

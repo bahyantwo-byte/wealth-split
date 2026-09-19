@@ -37,23 +37,24 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
-      - name: Build iOS (unsigned)
+      - name: Build iOS (ad-hoc signed)
         run: |
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=YES \
+            CODE_SIGNING_ALLOWED=YES \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
             -derivedDataPath $RUNNER_TEMP/DerivedData \
             build
 
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -r $RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/App.app Payload/
+          cp -r "$RUNNER_TEMP/DerivedData/Build/Products/Release-iphoneos/App.app" Payload/
           zip -r WealthSplit.ipa Payload
 
       - name: Upload IPA

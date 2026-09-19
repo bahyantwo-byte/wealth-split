@@ -37,6 +37,9 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
+      - name: Patch AppDelegate for direct URL injection
+        run: python3 scripts/patch_appdelegate.py
+
       - name: Register URL scheme in Info.plist
         run: |
           PLIST="ios/App/App/Info.plist"

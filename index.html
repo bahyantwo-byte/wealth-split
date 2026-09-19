@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Wealth Split">
@@ -49,8 +49,9 @@
   --safe-top:    env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { overscroll-behavior: none; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+html, body { overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
+input, textarea { user-select: text; -webkit-user-select: text; }
 body {
   background: var(--bg);
   color: var(--text);
@@ -1864,6 +1865,11 @@ function openImportError() {
   document.getElementById('close-sheet').addEventListener('click', closeSheet);
   document.getElementById('import-error-ok').addEventListener('click', closeSheet);
 }
+
+// Native app feel — block web behaviors
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('selectstart', e => { if (!e.target.closest('input,textarea')) e.preventDefault(); });
+document.addEventListener('dragstart', e => e.preventDefault());
 
 applyI18n();
 renderHome();

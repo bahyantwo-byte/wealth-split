@@ -2150,7 +2150,7 @@ function openAccessibilitySettings() {
 }
 
 function showBackTapPromo() {
-  if (!localStorage.getItem('ws_bt_setup') && localStorage.getItem('ws_onboarded')) {
+  if (!localStorage.getItem('ws_bt_setup')) {
     document.getElementById('bt-promo-card').style.display = 'flex';
   }
 }

@@ -335,25 +335,35 @@ input:focus { border-color: var(--dim); }
 @keyframes qcIn { from { opacity: 0; transform: scale(0.8) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 @keyframes qcOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
 
-/* ── BACK TAP SETUP GUIDE ── */
-#bt-guide { position: fixed; inset: 0; z-index: 250; background: rgba(0,0,0,0.7); display: flex; align-items: flex-end; }
+/* ── BACK TAP WIZARD ── */
+#bt-guide { position: fixed; inset: 0; z-index: 250; background: var(--bg); display: flex; flex-direction: column; padding: calc(var(--safe-top,0px) + 20px) 24px calc(var(--safe-bottom,0px) + 28px); overflow-y: auto; }
 #bt-guide.hidden { display: none; }
-.bt-sheet { background: var(--bg2); border-radius: 28px 28px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: calc(28px) 24px calc(var(--safe-bottom,0px) + 28px); }
-.bt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-.bt-title { font-size: 1.25rem; font-weight: 900; }
-.bt-close { width: 32px; height: 32px; border-radius: 16px; background: var(--bg4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-.bt-close svg { width: 16px; height: 16px; }
-.bt-sub { color: var(--dim); font-size: 0.88rem; margin-bottom: 24px; }
-.bt-step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
-.bt-num { width: 32px; height: 32px; border-radius: 16px; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
-.bt-step-body { flex: 1; }
-.bt-step-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 3px; }
-.bt-step-desc { font-size: 0.85rem; color: var(--dim); line-height: 1.5; }
-.bt-step-code { font-family: 'DM Mono', monospace; background: var(--bg3); border-radius: 8px; padding: 8px 12px; font-size: 0.82rem; margin-top: 8px; color: var(--text); word-break: break-all; }
-.bt-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; cursor: pointer; border: none; margin-top: 8px; margin-bottom: 12px; }
-.bt-btn-primary { background: var(--text); color: var(--bg); }
-.bt-btn-secondary { background: var(--bg3); color: var(--text); }
-.bt-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.bt-wizard-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 36px; }
+.bt-progress { display: flex; gap: 6px; }
+.bt-prog-dot { width: 8px; height: 8px; border-radius: 4px; background: var(--bg4); transition: all 0.3s; }
+.bt-prog-dot.active { width: 24px; background: var(--text); }
+.bt-skip { font-size: 0.85rem; color: var(--dim); font-weight: 600; cursor: pointer; padding: 4px 8px; }
+.bt-screen { display: none; flex: 1; flex-direction: column; }
+.bt-screen.active { display: flex; }
+.bt-hero { font-size: 4rem; margin-bottom: 20px; }
+.bt-wizard-title { font-size: 1.9rem; font-weight: 900; line-height: 1.15; letter-spacing: -0.03em; margin-bottom: 12px; }
+.bt-wizard-sub { font-size: 1rem; color: var(--dim); line-height: 1.6; margin-bottom: 32px; }
+.bt-action-card { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 16px; }
+.bt-action-label { font-size: 0.72rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; }
+.bt-action-row { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.bt-action-num { width: 26px; height: 26px; border-radius: 13px; background: var(--bg4); font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.bt-action-text { font-size: 0.9rem; font-weight: 600; flex: 1; }
+.bt-action-text strong { color: var(--text); }
+.bt-action-text .dim { color: var(--dim); font-weight: 500; }
+.bt-copy-row { display: flex; gap: 8px; align-items: center; background: var(--bg3); border-radius: 12px; padding: 10px 14px; margin-top: 6px; margin-bottom: 4px; }
+.bt-copy-url { font-family: 'DM Mono', monospace; font-size: 0.78rem; color: var(--text); flex: 1; word-break: break-all; }
+.bt-copy-btn { background: var(--text); color: var(--bg); border: none; border-radius: 10px; padding: 8px 14px; font-size: 0.8rem; font-weight: 800; cursor: pointer; flex-shrink: 0; white-space: nowrap; }
+.bt-main-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 20px; border-radius: 18px; font-weight: 900; font-size: 1.1rem; cursor: pointer; border: none; margin-top: auto; }
+.bt-main-btn-primary { background: var(--text); color: var(--bg); }
+.bt-main-btn-secondary { background: var(--bg3); color: var(--text); margin-top: 10px; padding: 16px; font-size: 1rem; }
+.bt-done-hero { font-size: 5rem; text-align: center; margin: auto 0; }
+.bt-done-title { font-size: 2rem; font-weight: 900; text-align: center; margin-bottom: 12px; }
+.bt-done-sub { font-size: 1rem; color: var(--dim); text-align: center; line-height: 1.6; }
 .bt-setup-card { background: var(--bg3); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; margin-bottom: 12px; }
 .bt-setup-icon { font-size: 1.6rem; }
 .bt-setup-text { flex: 1; }
@@ -369,64 +379,74 @@ input:focus { border-color: var(--dim); }
   <div class="ob-step" id="ob-step-content"></div>
 </div>
 
-<!-- BACK TAP GUIDE OVERLAY -->
+<!-- BACK TAP WIZARD -->
 <div id="bt-guide" class="hidden">
-  <div class="bt-sheet">
-    <div class="bt-header">
-      <div class="bt-title">👆 Set Up Back Tap</div>
-      <div class="bt-close" onclick="closeBackTapGuide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+  <div class="bt-wizard-top">
+    <div class="bt-progress">
+      <div class="bt-prog-dot active" id="bt-dot-0"></div>
+      <div class="bt-prog-dot" id="bt-dot-1"></div>
     </div>
-    <div class="bt-sub">Double-tap the back of your iPhone to instantly log spending — without opening the app.</div>
+    <div class="bt-skip" onclick="closeBackTapGuide()">Skip</div>
+  </div>
 
-    <div id="bt-step-1">
-      <div class="bt-step">
-        <div class="bt-num">1</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Open the Shortcuts app</div>
-          <div class="bt-step-desc">It's pre-installed on every iPhone. Search for "Shortcuts" if you can't find it.</div>
-        </div>
+  <!-- STEP 1: Create Shortcut -->
+  <div class="bt-screen active" id="bt-screen-0">
+    <div class="bt-hero">⚡</div>
+    <div class="bt-wizard-title">Step 1 of 2</div>
+    <div class="bt-wizard-sub">We need to create a "Quick Spend" shortcut on your phone. Tap the button below — it opens the Shortcuts app for you.</div>
+
+    <div class="bt-action-card">
+      <div class="bt-action-label">Inside Shortcuts, do these 4 things:</div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">1</div>
+        <div class="bt-action-text">Tap <strong>+</strong> → name it <strong>Quick Spend</strong></div>
       </div>
-      <div class="bt-step">
-        <div class="bt-num">2</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Tap the + button → Add Action</div>
-          <div class="bt-step-desc">Search for "Ask for Input" and select it. Set the type to <strong>Number</strong> and the prompt to <strong>"How much did you spend?"</strong></div>
-        </div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">2</div>
+        <div class="bt-action-text">Tap <strong>Add Action</strong> → search <strong>Ask for Input</strong> → pick <strong>Number</strong></div>
       </div>
-      <div class="bt-step">
-        <div class="bt-num">3</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Add a "URL" action</div>
-          <div class="bt-step-desc">Add a URL action and paste this exactly:</div>
-          <div class="bt-step-code" id="bt-url-copy">wealthsplit://add?type=expense&amount=<span style="opacity:0.5">[Provided Input]</span></div>
-          <button class="btn-primary bt-btn" style="margin-top:10px" onclick="copyShortcutUrl()">Copy URL Template</button>
-        </div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">3</div>
+        <div class="bt-action-text">Tap <strong>Add Action</strong> → search <strong>URL</strong> → paste this:</div>
       </div>
-      <div class="bt-step">
-        <div class="bt-num">4</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Add "Open URLs" action</div>
-          <div class="bt-step-desc">This tells the shortcut to open Wealth Split with that URL when it runs.</div>
-        </div>
+      <div class="bt-copy-row">
+        <div class="bt-copy-url">wealthsplit://add?type=expense&amp;amount=[Provided Input]</div>
+        <button class="bt-copy-btn" id="bt-copy-btn" onclick="btCopyUrl(this)">Copy</button>
       </div>
-      <div class="bt-step">
-        <div class="bt-num">5</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Name it "Quick Spend" and save</div>
-          <div class="bt-step-desc">Tap the ✕ to close and save the shortcut.</div>
-        </div>
+      <div class="bt-action-row" style="margin-top:8px">
+        <div class="bt-action-num">4</div>
+        <div class="bt-action-text">Tap <strong>Add Action</strong> → search <strong>Open URLs</strong> → tap <strong>Done</strong></div>
       </div>
-      <hr class="bt-divider">
-      <div class="bt-step">
-        <div class="bt-num">6</div>
-        <div class="bt-step-body">
-          <div class="bt-step-title">Go to Back Tap settings</div>
-          <div class="bt-step-desc">Settings → Accessibility → Touch → Back Tap → Double Tap → select "Quick Spend"</div>
-        </div>
-      </div>
-      <button class="btn-primary bt-btn bt-btn-primary" onclick="openAccessibilitySettings()">Open Accessibility Settings</button>
-      <button class="btn-primary bt-btn bt-btn-secondary" onclick="dismissBackTapGuide()">Got it, all set!</button>
     </div>
+
+    <button class="bt-main-btn bt-main-btn-primary" onclick="btOpenShortcuts()">Open Shortcuts App →</button>
+    <button class="bt-main-btn bt-main-btn-secondary" onclick="btGoToStep(1)">Shortcut is ready, next →</button>
+  </div>
+
+  <!-- STEP 2: Enable Back Tap -->
+  <div class="bt-screen" id="bt-screen-1">
+    <div class="bt-hero">🔧</div>
+    <div class="bt-wizard-title">Step 2 of 2</div>
+    <div class="bt-wizard-sub">Almost done! Tap the button below — it opens the exact settings screen you need. Then just tap <strong>Double Tap → Quick Spend</strong>.</div>
+
+    <div class="bt-action-card">
+      <div class="bt-action-label">Once settings opens:</div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">1</div>
+        <div class="bt-action-text">Tap <strong>Double Tap</strong></div>
+      </div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">2</div>
+        <div class="bt-action-text">Scroll down and select <strong>Quick Spend</strong></div>
+      </div>
+      <div class="bt-action-row">
+        <div class="bt-action-num">3</div>
+        <div class="bt-action-text">Come back to Wealth Split — you're done!</div>
+      </div>
+    </div>
+
+    <button class="bt-main-btn bt-main-btn-primary" onclick="btOpenBackTap()">Open Back Tap Settings →</button>
+    <button class="bt-main-btn bt-main-btn-secondary" onclick="btFinish()">All set! 🎉</button>
   </div>
 </div>
 
@@ -2128,28 +2148,37 @@ function openQuickAdd(prefillType) {
 })();
 
 /* ── CAPACITOR URL SCHEME ── */
-/* ── BACK TAP GUIDE ── */
+/* ── BACK TAP WIZARD ── */
 function openBackTapGuide() {
+  btGoToStep(0);
   document.getElementById('bt-guide').classList.remove('hidden');
 }
 function closeBackTapGuide() {
   document.getElementById('bt-guide').classList.add('hidden');
 }
-function dismissBackTapGuide() {
+function btGoToStep(n) {
+  document.querySelectorAll('.bt-screen').forEach((s, i) => s.classList.toggle('active', i === n));
+  document.querySelectorAll('.bt-prog-dot').forEach((d, i) => d.classList.toggle('active', i === n));
+}
+function btCopyUrl(btn) {
+  const url = 'wealthsplit://add?type=expense&amount=';
+  navigator.clipboard && navigator.clipboard.writeText(url).catch(() => {});
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+}
+function btOpenShortcuts() {
+  window.location.href = 'shortcuts://create-shortcut';
+}
+function btOpenBackTap() {
+  window.location.href = 'App-prefs:root=ACCESSIBILITY&path=TOUCH/BACK_TAP';
+  setTimeout(() => { window.location.href = 'prefs:root=ACCESSIBILITY&path=TOUCH/BACK_TAP'; }, 500);
+}
+function btFinish() {
   localStorage.setItem('ws_bt_setup', '1');
   document.getElementById('bt-promo-card').style.display = 'none';
   closeBackTapGuide();
 }
-function copyShortcutUrl() {
-  navigator.clipboard && navigator.clipboard.writeText('wealthsplit://add?type=expense&amount=').catch(() => {});
-  const btn = event.target;
-  btn.textContent = 'Copied!';
-  setTimeout(() => { btn.textContent = 'Copy URL Template'; }, 2000);
-}
-function openAccessibilitySettings() {
-  window.location.href = 'App-prefs:root=ACCESSIBILITY';
-  setTimeout(() => { window.location.href = 'prefs:root=ACCESSIBILITY'; }, 400);
-}
+function dismissBackTapGuide() { btFinish(); }
 
 function showBackTapPromo() {
   if (!localStorage.getItem('ws_bt_setup')) {

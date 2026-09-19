@@ -2186,28 +2186,30 @@ function openCloudSyncSetup() {
     <div class="sheet-handle"></div>
     <div class="sheet-head"><h3>⚡ Quick Entry</h3><div class="sheet-close" id="close-sheet" role="button">${ICONS.close}</div></div>
 
-    <div style="margin-bottom:20px">
+    <div style="margin-bottom:16px">
       <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Your Sync Key</div>
       <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:14px;padding:14px 16px;border:1px solid var(--border)">
         <div id="ws-sync-key" style="font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${syncKey}</div>
         <button id="copy-key-btn" style="flex-shrink:0;background:var(--bg4);border:none;color:var(--text);font-size:0.78rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer">Copy</button>
       </div>
-      <div style="font-size:0.8rem;color:var(--dim);margin-top:8px;line-height:1.5">This key links the shortcut to your app. You only need it once.</div>
     </div>
 
-    ${ready && shortcutUrl ? `
-    <div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border)">
-      <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Step 1 — Install Shortcut</div>
-      <div style="font-size:0.82rem;color:var(--dim);margin-bottom:12px;line-height:1.5">Tap to add the Quick Spend shortcut to your iPhone. When it asks for your key, paste the one above.</div>
-      <button class="btn-primary" id="install-shortcut-btn">⚡ Install Shortcut</button>
+    ${ready ? `
+    <div style="margin-bottom:16px">
+      <div style="font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Shortcut Request URL</div>
+      <div style="display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:14px;padding:14px 16px;border:1px solid var(--border)">
+        <div style="font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Supabase endpoint + API key</div>
+        <button id="copy-url-btn" style="flex-shrink:0;background:var(--bg4);border:none;color:var(--text);font-size:0.78rem;font-weight:700;padding:6px 12px;border-radius:8px;cursor:pointer">Copy</button>
+      </div>
+      <div style="font-size:0.78rem;color:var(--dim);margin-top:8px;line-height:1.5">Paste this as the URL in your shortcut's "Get Contents of URL" action. The API key is already included.</div>
     </div>
     <div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border)">
-      <div style="font-weight:700;font-size:0.9rem;margin-bottom:4px">Step 2 — Set Up Back Tap</div>
-      <div style="font-size:0.82rem;color:var(--dim);line-height:1.5">Settings → Accessibility → Touch → Back Tap → Double Tap → Quick Spend</div>
+      <div style="font-weight:700;font-size:0.9rem;margin-bottom:8px">Back Tap Setup</div>
+      <div style="font-size:0.82rem;color:var(--dim);line-height:1.6">Settings → Accessibility → Touch → Back Tap → Double Tap → Quick Spend</div>
     </div>
     ` : `
     <div style="background:var(--bg3);border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid var(--border)">
-      <div style="font-size:0.85rem;color:var(--dim);line-height:1.6">Install a newer build to get the shortcut link. Make sure SUPABASE_URL and SUPABASE_ANON_KEY are set in GitHub secrets.</div>
+      <div style="font-size:0.85rem;color:var(--dim);line-height:1.6">Make sure SUPABASE_URL and SUPABASE_ANON_KEY are set in GitHub secrets and rebuild.</div>
     </div>
     `}
 
@@ -2221,6 +2223,17 @@ function openCloudSyncSetup() {
     this.textContent = 'Copied!';
     setTimeout(() => { this.textContent = 'Copy'; }, 2000);
   });
+
+  const copyUrlBtn = document.getElementById('copy-url-btn');
+  if (copyUrlBtn) {
+    const { url: sbUrl, key: sbKey } = wsCredentials();
+    const requestUrl = `${sbUrl}/rest/v1/pending_entries?apikey=${sbKey}`;
+    copyUrlBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(requestUrl).catch(() => {});
+      this.textContent = 'Copied!';
+      setTimeout(() => { this.textContent = 'Copy'; }, 2000);
+    });
+  }
 
   const installBtn = document.getElementById('install-shortcut-btn');
   if (installBtn) installBtn.addEventListener('click', () => { window.open(shortcutUrl, '_blank'); });

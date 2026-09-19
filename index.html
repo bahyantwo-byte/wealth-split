@@ -420,7 +420,8 @@ input:focus { border-color: var(--dim); }
     </div>
 
     <button class="bt-main-btn bt-main-btn-primary" onclick="btOpenShortcuts()">Open Shortcuts App →</button>
-    <button class="bt-main-btn bt-main-btn-secondary" onclick="btGoToStep(1)">Shortcut is ready, next →</button>
+    <button class="bt-main-btn bt-main-btn-secondary" onclick="btTestUrl()">🧪 Test it first ($5 fake log)</button>
+    <button class="bt-main-btn bt-main-btn-secondary" style="margin-top:4px;opacity:0.7;font-size:0.9rem;padding:12px" onclick="btGoToStep(1)">Shortcut works, next step →</button>
   </div>
 
   <!-- STEP 2: Enable Back Tap -->
@@ -2179,6 +2180,10 @@ function btFinish() {
   closeBackTapGuide();
 }
 function dismissBackTapGuide() { btFinish(); }
+function btTestUrl() {
+  // Simulates what the shortcut does — tests the URL handler directly
+  autoLogFromUrl('expense', 5);
+}
 
 function showBackTapPromo() {
   if (!localStorage.getItem('ws_bt_setup')) {
@@ -2230,22 +2235,30 @@ function autoLogFromUrl(type, amount) {
   setTimeout(() => renderHome(), 100);
 }
 
+function handleAppUrl(rawUrl) {
+  try {
+    const url = new URL(rawUrl);
+    const host = url.host;
+    if (host === 'add') {
+      const type = url.searchParams.get('type') || 'expense';
+      const amount = url.searchParams.get('amount') || '0';
+      autoLogFromUrl(type, amount);
+    } else if (host === 'quick-add') {
+      const type = url.searchParams.get('type') || 'expense';
+      openQuickAdd(type);
+    }
+  } catch(e) {}
+}
+
 try {
   if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
-    window.Capacitor.Plugins.App.addListener('appUrlOpen', data => {
-      try {
-        const url = new URL(data.url);
-        const host = url.host;
-        if (host === 'add') {
-          const type = url.searchParams.get('type') || 'expense';
-          const amount = url.searchParams.get('amount') || '0';
-          autoLogFromUrl(type, amount);
-        } else if (host === 'quick-add') {
-          const type = url.searchParams.get('type') || 'expense';
-          openQuickAdd(type);
-        }
-      } catch(e) {}
-    });
+    const App = window.Capacitor.Plugins.App;
+    // Handle URL when app is already running
+    App.addListener('appUrlOpen', data => { handleAppUrl(data.url); });
+    // Handle URL when app launches cold from a URL (most common with shortcuts)
+    App.getLaunchUrl().then(result => {
+      if (result && result.url) handleAppUrl(result.url);
+    }).catch(() => {});
   }
 } catch(e) {}
 </script>

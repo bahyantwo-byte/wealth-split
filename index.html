@@ -112,6 +112,7 @@ body::before {
 .summary-label { font-size: 0.72rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
 .summary-total { font-size: 2.5rem; font-weight: 800; margin-top: 4px; letter-spacing: -0.02em; }
 .summary-total.neg { color: var(--dim); }
+.summary-safe { font-size: 0.78rem; color: var(--amber); font-weight: 600; margin-top: 6px; }
 .summary-stats { display: flex; gap: 18px; margin-top: 16px; }
 .summary-stat { flex: 1; }
 .summary-stat .lbl { display: flex; align-items: center; gap: 5px; font-size: 0.65rem; color: var(--dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
@@ -313,6 +314,14 @@ input:focus { border-color: var(--dim); }
 .ob-btn-skip { background: none; color: var(--dim); font-size: 0.85rem; padding: 8px; }
 .ob-bucket-preview { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
 .ob-bucket-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg2); border-radius: 14px; border: 1px solid var(--border); }
+.ob-bills-list { display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; padding-bottom: 4px; }
+.ob-bill-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 14px; }
+.ob-bill-row input { border: none; background: transparent; outline: none; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; min-width: 0; -webkit-appearance: none; }
+.ob-bill-row input::placeholder { color: var(--dim); font-weight: 500; }
+.ob-bill-name { flex: 1.6; }
+.ob-bill-day { flex: 0.6; text-align: center; }
+.ob-bill-amount { flex: 1; font-family: 'DM Mono', monospace; }
+.ob-add-bill-btn { width: 100%; padding: 13px; border-radius: 14px; border: 1.5px dashed var(--border); background: none; color: var(--dim); font-size: 0.85rem; font-weight: 700; cursor: pointer; margin-top: 2px; }
 .ob-bucket-dot { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .ob-bucket-dot svg { width: 16px; height: 16px; }
 .ob-bucket-name { font-weight: 700; font-size: 0.9rem; flex: 1; }
@@ -468,6 +477,7 @@ input:focus { border-color: var(--dim); }
     <div class="summary-card">
       <div class="summary-label" data-i18n="available_to_spend">Available to Spend</div>
       <div class="summary-total mono" id="summary-available">$0</div>
+      <div class="summary-safe" id="summary-safe" style="display:none"></div>
       <div class="summary-stats">
         <div class="summary-stat">
           <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 12 16 16 12"/><line x1="12" y1="8" x2="12" y2="16"/></svg><span data-i18n="income">Income</span></div>
@@ -675,6 +685,7 @@ en: {
   nav_home: 'Home', nav_add: 'Add', nav_history: 'History', nav_settings: 'Settings',
   greeting_morning: 'Good morning', greeting_afternoon: 'Good afternoon', greeting_evening: 'Good evening',
   open_profile: 'Open profile', available_to_spend: 'Available to Spend', income: 'Income', spent: 'Spent',
+  safe_to_spend_line: '{amt} safe to spend · {bills} set aside for bills',
   spending_breakdown_aria: 'View spending breakdown by category', due_now: 'Due Now', log: 'Log',
   allocation: 'Allocation', total: 'Total', your_buckets: 'Your Buckets',
   counted_as_spent: 'Counted as spent when added', goal_progress: '{bal} of {goal} goal',
@@ -724,6 +735,7 @@ es: {
   nav_home: 'Inicio', nav_add: 'Añadir', nav_history: 'Historial', nav_settings: 'Ajustes',
   greeting_morning: 'Buenos días', greeting_afternoon: 'Buenas tardes', greeting_evening: 'Buenas noches',
   open_profile: 'Abrir perfil', available_to_spend: 'Disponible para gastar', income: 'Ingresos', spent: 'Gastado',
+  safe_to_spend_line: '{amt} seguro para gastar · {bills} apartado para facturas',
   spending_breakdown_aria: 'Ver desglose de gastos por categoría', due_now: 'Vence ahora', log: 'Registrar',
   allocation: 'Distribución', total: 'Total', your_buckets: 'Tus categorías',
   counted_as_spent: 'Se cuenta como gastado al añadirse', goal_progress: '{bal} de {goal} de meta',
@@ -773,6 +785,7 @@ pt: {
   nav_home: 'Início', nav_add: 'Adicionar', nav_history: 'Histórico', nav_settings: 'Ajustes',
   greeting_morning: 'Bom dia', greeting_afternoon: 'Boa tarde', greeting_evening: 'Boa noite',
   open_profile: 'Abrir perfil', available_to_spend: 'Disponível para gastar', income: 'Renda', spent: 'Gasto',
+  safe_to_spend_line: '{amt} seguro para gastar · {bills} reservado para contas',
   spending_breakdown_aria: 'Ver detalhamento de gastos por categoria', due_now: 'Vencendo agora', log: 'Registrar',
   allocation: 'Distribuição', total: 'Total', your_buckets: 'Suas categorias',
   counted_as_spent: 'Contado como gasto ao ser adicionado', goal_progress: '{bal} de {goal} da meta',
@@ -822,6 +835,7 @@ ko: {
   nav_home: '홈', nav_add: '추가', nav_history: '내역', nav_settings: '설정',
   greeting_morning: '좋은 아침이에요', greeting_afternoon: '좋은 오후예요', greeting_evening: '좋은 저녁이에요',
   open_profile: '프로필 열기', available_to_spend: '사용 가능 금액', income: '수입', spent: '지출',
+  safe_to_spend_line: '청구서 {bills} 제외하고 {amt} 안전하게 사용 가능',
   spending_breakdown_aria: '카테고리별 지출 내역 보기', due_now: '지금 결제 예정', log: '기록',
   allocation: '배분', total: '총액', your_buckets: '내 카테고리',
   counted_as_spent: '추가 시 지출로 계산됨', goal_progress: '{goal} 목표 중 {bal}',
@@ -871,6 +885,7 @@ ja: {
   nav_home: 'ホーム', nav_add: '追加', nav_history: '履歴', nav_settings: '設定',
   greeting_morning: 'おはようございます', greeting_afternoon: 'こんにちは', greeting_evening: 'こんばんは',
   open_profile: 'プロフィールを開く', available_to_spend: '使える金額', income: '収入', spent: '支出',
+  safe_to_spend_line: '請求書用に{bills}を確保 · 残り{amt}まで安全に使えます',
   spending_breakdown_aria: 'カテゴリ別の支出内訳を見る', due_now: '支払い期限', log: '記録',
   allocation: '配分', total: '合計', your_buckets: 'カテゴリ一覧',
   counted_as_spent: '追加時に支出として計上', goal_progress: '目標{goal}のうち{bal}',
@@ -939,6 +954,7 @@ const DEFAULT_STATE = {
   profile: { name: '' },
   recurring: [],
   lang: 'en',
+  monthlyIncome: null,
 };
 
 let state = load();
@@ -958,6 +974,7 @@ function load() {
     if (!parsed.profile) { parsed.profile = { name: '' }; migrated = true; }
     if (!parsed.recurring) { parsed.recurring = []; migrated = true; }
     if (!parsed.lang || !LOCALE_MAP[parsed.lang]) { parsed.lang = 'en'; migrated = true; }
+    if (typeof parsed.monthlyIncome === 'undefined') { parsed.monthlyIncome = null; migrated = true; }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
@@ -1089,6 +1106,15 @@ function renderHome() {
   const availableEl = document.getElementById('summary-available');
   availableEl.textContent = fmt(available);
   availableEl.classList.toggle('neg', available < 0);
+
+  const upcomingBills = state.recurring.reduce((s, r) => s + r.amount, 0);
+  const safeEl = document.getElementById('summary-safe');
+  if (upcomingBills > 0) {
+    safeEl.style.display = 'block';
+    safeEl.textContent = t('safe_to_spend_line', { amt: fmt(available - upcomingBills), bills: fmt(upcomingBills) });
+  } else {
+    safeEl.style.display = 'none';
+  }
 
   const list = document.getElementById('bucket-list');
   list.innerHTML = '';
@@ -1285,6 +1311,15 @@ function advanceRecurDate(dateStr, freq) {
   else if (freq === 'monthly') d.setMonth(d.getMonth() + 1);
   else if (freq === 'yearly') d.setFullYear(d.getFullYear() + 1);
   return d.toISOString().slice(0, 10);
+}
+
+function nextDateForDay(day) {
+  const now = new Date();
+  const clampDay = (y, m) => Math.min(day, new Date(y, m + 1, 0).getDate());
+  const y = now.getFullYear(), m = now.getMonth();
+  let candidate = new Date(y, m, clampDay(y, m));
+  if (candidate < new Date(y, m, now.getDate())) candidate = new Date(y, m + 1, clampDay(y, m + 1));
+  return candidate.toISOString().slice(0, 10);
 }
 
 function logRecurring(id) {
@@ -1992,7 +2027,7 @@ function openQuickAdd(prefillType) {
     return;
   }
 
-  let obStep = 0, obName = '', obGoals = [], obStruggles = [];
+  let obStep = 0, obName = '', obGoals = [], obStruggles = [], obMonthlyIncome = '', obBills = [];
   const obEl = document.getElementById('onboarding');
   const progressEl = document.getElementById('ob-progress');
   const stepEl = document.getElementById('ob-step-content');
@@ -2014,7 +2049,7 @@ function openQuickAdd(prefillType) {
 
   function renderProgress() {
     progressEl.innerHTML = '';
-    const total = 4;
+    const total = 6;
     for (let i = 0; i < total; i++) {
       const d = document.createElement('div');
       d.className = 'ob-dot' + (i === Math.max(0, obStep - 1) ? ' active' : '');
@@ -2029,6 +2064,8 @@ function openQuickAdd(prefillType) {
     else if (obStep === 1) renderName();
     else if (obStep === 2) renderGoals();
     else if (obStep === 3) renderStruggles();
+    else if (obStep === 4) renderIncome();
+    else if (obStep === 5) renderBills();
     else renderBucketPreview();
   }
 
@@ -2093,7 +2130,7 @@ function openQuickAdd(prefillType) {
       <div class="ob-sub">No judgment — these areas get their own dedicated bucket so you can actually track them.</div>
       <div class="ob-options" id="ob-list"></div>
       <div class="ob-actions">
-        <button class="ob-btn ob-btn-primary" id="ob-next">See My Setup</button>
+        <button class="ob-btn ob-btn-primary" id="ob-next">Continue</button>
         <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
       </div>`;
     const list = document.getElementById('ob-list');
@@ -2109,6 +2146,69 @@ function openQuickAdd(prefillType) {
     });
     document.getElementById('ob-next').onclick = () => { obStep = 4; renderStep(); };
     document.getElementById('ob-skip').onclick = () => { obStruggles = []; obStep = 4; renderStep(); };
+  }
+
+  function renderIncome() {
+    stepEl.innerHTML = `
+      <div class="ob-title">How much do you make monthly?</div>
+      <div class="ob-sub">So we can set aside money for bills before you spend it. You can always update this later.</div>
+      <div class="amount-input-wrap" style="border-radius:16px;padding:18px 20px">
+        <span class="cur" style="font-size:1.4rem">$</span>
+        <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="ob-income-input" style="font-size:1.4rem" value="${obMonthlyIncome}">
+      </div>
+      <div style="flex:1"></div>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next">Continue</button>
+        <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
+      </div>`;
+    const inp = document.getElementById('ob-income-input');
+    inp.oninput = () => { obMonthlyIncome = inp.value; };
+    document.getElementById('ob-next').onclick = () => { obStep = 5; renderStep(); };
+    document.getElementById('ob-skip').onclick = () => { obMonthlyIncome = ''; obStep = 5; renderStep(); };
+  }
+
+  function renderBills() {
+    stepEl.innerHTML = `
+      <div class="ob-title">Any big bills to plan around?</div>
+      <div class="ob-sub">Rent, car payment, insurance — anything with a due date. We'll set money aside for these so you always know what's actually safe to spend.</div>
+      <div class="ob-bills-list" id="ob-bills-list"></div>
+      <button class="ob-add-bill-btn" id="ob-add-bill">+ Add a bill</button>
+      <div class="ob-actions">
+        <button class="ob-btn ob-btn-primary" id="ob-next">See My Setup</button>
+        <button class="ob-btn ob-btn-skip" id="ob-skip">Skip</button>
+      </div>`;
+    const listEl = document.getElementById('ob-bills-list');
+
+    function addRow(bill) {
+      const row = document.createElement('div');
+      row.className = 'ob-bill-row';
+      row.innerHTML = `
+        <input type="text" class="ob-bill-name" placeholder="Bill name" maxlength="30" value="${bill.name}">
+        <input type="number" class="ob-bill-day" placeholder="Day" min="1" max="31" step="1" value="${bill.day}">
+        <input type="number" class="ob-bill-amount" placeholder="0.00" min="0" step="0.01" value="${bill.amount}">
+        <div class="icon-del-btn" role="button" aria-label="Remove bill">${ICONS.trash}</div>`;
+      const nameInp = row.querySelector('.ob-bill-name');
+      const dayInp = row.querySelector('.ob-bill-day');
+      const amtInp = row.querySelector('.ob-bill-amount');
+      nameInp.oninput = () => { bill.name = nameInp.value; };
+      dayInp.oninput = () => { bill.day = dayInp.value; };
+      amtInp.oninput = () => { bill.amount = amtInp.value; };
+      row.querySelector('.icon-del-btn').onclick = () => {
+        obBills = obBills.filter(b => b !== bill);
+        row.remove();
+      };
+      listEl.appendChild(row);
+    }
+
+    obBills.forEach(addRow);
+    document.getElementById('ob-add-bill').onclick = () => {
+      const bill = { name: '', day: '', amount: '' };
+      obBills.push(bill);
+      addRow(bill);
+    };
+
+    document.getElementById('ob-next').onclick = () => { obStep = 6; renderStep(); };
+    document.getElementById('ob-skip').onclick = () => { obBills = []; obStep = 6; renderStep(); };
   }
 
   function buildBuckets() {
@@ -2158,6 +2258,16 @@ function openQuickAdd(prefillType) {
     document.getElementById('ob-finish').onclick = () => {
       if (obName) state.profile.name = obName;
       state.buckets = generated;
+      const income = parseFloat(obMonthlyIncome);
+      if (income > 0) state.monthlyIncome = income;
+      const billBucketId = generated[0].id;
+      obBills.forEach(bill => {
+        const name = bill.name.trim();
+        const amount = parseFloat(bill.amount);
+        const day = Math.min(31, Math.max(1, parseInt(bill.day) || 1));
+        if (!name || !(amount > 0)) return;
+        state.recurring.push({ id: uid(), name, amount, bucketId: billBucketId, frequency: 'monthly', nextDate: nextDateForDay(day) });
+      });
       save();
       localStorage.setItem('ws_onboarded', '1');
       obEl.style.transition = 'opacity 0.4s, transform 0.4s';

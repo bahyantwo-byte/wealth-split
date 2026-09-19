@@ -1776,6 +1776,7 @@ function openProfile() {
     <div class="chip-row" id="lang-chips">${langChips}</div>
     <div class="section-title" style="padding:16px 0 8px">${t('app_section')}</div>
     <div class="profile-menu">
+      <div class="profile-menu-item" id="cloud-sync-btn">${ICONS.trendUp} Cloud Sync Setup<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="back-tap-setup-btn">${ICONS.target} Set Up Back Tap<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="export-data-btn">${ICONS.download}${t('export_data')}<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}${t('import_data')}<span class="chev">${ICONS.chev}</span></div>
@@ -1808,6 +1809,7 @@ function openProfile() {
       openProfile();
     });
   });
+  document.getElementById('cloud-sync-btn').addEventListener('click', () => { closeSheet(); openCloudSyncSetup(); });
   document.getElementById('back-tap-setup-btn').addEventListener('click', () => { closeSheet(); openBackTapGuide(); });
   document.getElementById('export-data-btn').addEventListener('click', exportData);
   document.getElementById('import-data-btn').addEventListener('click', () => {
@@ -2155,6 +2157,97 @@ function openQuickAdd(prefillType) {
 })();
 
 /* ── CAPACITOR URL SCHEME ── */
+/* ── CLOUD SYNC ── */
+function openCloudSyncSetup() {
+  const url = localStorage.getItem('ws_sb_url') || '';
+  const key = localStorage.getItem('ws_sb_key') || '';
+  const connected = url && key;
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>☁️ Cloud Sync</h3><div class="sheet-close" id="close-sheet" role="button">${ICONS.close}</div></div>
+    <p style="font-size:0.88rem;color:var(--dim);margin-bottom:20px;line-height:1.6">Paste your Supabase credentials so the shortcut can log entries without opening the app.</p>
+    <div class="field">
+      <label>Supabase Project URL</label>
+      <input type="url" id="sb-url" placeholder="https://xxxx.supabase.co" value="${url}" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label>Anon Public Key</label>
+      <input type="text" id="sb-key" placeholder="eyJ..." value="${key}" autocomplete="off" autocorrect="off" spellcheck="false">
+    </div>
+    ${connected ? '<div style="background:var(--bg3);border-radius:12px;padding:12px 16px;font-size:0.85rem;color:var(--green);font-weight:700;margin-bottom:16px">✓ Connected</div>' : ''}
+    <button class="btn-primary" id="sb-save-btn">Save & Connect</button>
+    ${connected ? '<button class="btn-primary" id="sb-sync-btn" style="background:var(--bg3);color:var(--text);margin-top:10px">Sync Now</button>' : ''}
+    ${connected ? '<button class="btn-primary" id="sb-clear-btn" style="background:var(--bg3);color:var(--dim);margin-top:10px;font-size:0.85rem">Disconnect</button>' : ''}
+  `);
+  document.getElementById('close-sheet').addEventListener('click', closeSheet);
+  document.getElementById('sb-save-btn').addEventListener('click', () => {
+    const u = document.getElementById('sb-url').value.trim().replace(/\/$/, '');
+    const k = document.getElementById('sb-key').value.trim();
+    if (!u || !k) { alert('Enter both fields.'); return; }
+    localStorage.setItem('ws_sb_url', u);
+    localStorage.setItem('ws_sb_key', k);
+    closeSheet();
+    syncFromSupabase(true);
+  });
+  const syncBtn = document.getElementById('sb-sync-btn');
+  if (syncBtn) syncBtn.addEventListener('click', () => { closeSheet(); syncFromSupabase(true); });
+  const clearBtn = document.getElementById('sb-clear-btn');
+  if (clearBtn) clearBtn.addEventListener('click', () => {
+    localStorage.removeItem('ws_sb_url');
+    localStorage.removeItem('ws_sb_key');
+    closeSheet();
+  });
+}
+
+async function syncFromSupabase(showFeedback) {
+  const sbUrl = localStorage.getItem('ws_sb_url');
+  const sbKey = localStorage.getItem('ws_sb_key');
+  if (!sbUrl || !sbKey) return;
+  try {
+    const res = await fetch(`${sbUrl}/rest/v1/pending_entries?select=*&order=created_at.asc`, {
+      headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }
+    });
+    if (!res.ok) return;
+    const entries = await res.json();
+    if (!entries || !entries.length) {
+      if (showFeedback) showQuickConfirm('synced', 0);
+      return;
+    }
+    const s = load();
+    entries.forEach(entry => {
+      const amt = parseFloat(entry.amount);
+      if (isNaN(amt) || amt <= 0) return;
+      const dateStr = new Date(entry.created_at).toISOString().slice(0, 10);
+      if (entry.type === 'income') {
+        s.transactions.push({ id: uid(), bucketId: null, amount: amt, note: 'Quick Income', date: dateStr, ts: Date.now(), type: 'income' });
+        s.totalIncome = (s.totalIncome || 0) + amt;
+        if (s.buckets) {
+          const total = s.buckets.reduce((sum, b) => sum + (b.pct || 0), 0) || 100;
+          s.buckets.forEach(b => { b.budget = ((b.pct || 0) / total) * s.totalIncome; });
+        }
+      } else {
+        const bucket = s.buckets && s.buckets[0];
+        if (bucket) {
+          s.transactions.push({ id: uid(), bucketId: bucket.id, amount: amt, note: 'Quick Entry', date: dateStr, ts: Date.now(), type: 'expense' });
+          bucket.spent = (bucket.spent || 0) + amt;
+        }
+      }
+    });
+    save(s);
+    const ids = entries.map(e => `"${e.id}"`).join(',');
+    await fetch(`${sbUrl}/rest/v1/pending_entries?id=in.(${ids})`, {
+      method: 'DELETE',
+      headers: { apikey: sbKey, Authorization: `Bearer ${sbKey}` }
+    });
+    const total = entries.reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+    showQuickConfirm(entries[0].type || 'expense', total);
+    renderHome();
+  } catch(e) {}
+}
+
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncFromSupabase(false); });
+syncFromSupabase(false);
+
 /* ── BACK TAP WIZARD ── */
 function openBackTapGuide() {
   btGoToStep(0);

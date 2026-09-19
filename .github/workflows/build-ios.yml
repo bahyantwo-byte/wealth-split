@@ -37,11 +37,6 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
-      - name: Install CocoaPods
-        run: |
-          cd ios/App
-          pod install
-
       - name: Build iOS (unsigned)
         run: |
           xcodebuild \
@@ -53,6 +48,7 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             -derivedDataPath $RUNNER_TEMP/DerivedData \
+            -clonedSourcePackagesDirPath $RUNNER_TEMP/SPM \
             build
 
       - name: Package IPA

@@ -40,7 +40,7 @@ jobs:
       - name: Build iOS (unsigned)
         run: |
           xcodebuild \
-            -workspace ios/App/App.xcworkspace \
+            -project ios/App/App.xcodeproj \
             -scheme App \
             -sdk iphoneos \
             -configuration Release \
@@ -48,7 +48,6 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO \
             -derivedDataPath $RUNNER_TEMP/DerivedData \
-            -clonedSourcePackagesDirPath $RUNNER_TEMP/SPM \
             build
 
       - name: Package IPA

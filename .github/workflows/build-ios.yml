@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build-ios:
     runs-on: macos-latest
@@ -30,6 +35,40 @@ jobs:
           cp sw.js www/ 2>/dev/null || true
           cp -r icons www/ 2>/dev/null || true
           cp -r assets www/ 2>/dev/null || true
+
+      - name: Inject Supabase credentials
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+          SHORTCUT_URL="https://${OWNER}.github.io/${REPO}/QuickSpend.shortcut"
+          sed -i "s|__SUPABASE_URL__|${SUPABASE_URL}|g" www/index.html
+          sed -i "s|__SUPABASE_ANON_KEY__|${SUPABASE_ANON_KEY}|g" www/index.html
+          sed -i "s|__SHORTCUT_URL__|${SHORTCUT_URL}|g" www/index.html
+          echo "Credentials and shortcut URL injected."
+
+      - name: Generate QuickSpend shortcut
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          mkdir -p pages
+          python3 scripts/generate_shortcut.py \
+            "${SUPABASE_URL}" \
+            "${SUPABASE_ANON_KEY}" \
+            "pages/QuickSpend.shortcut.xml"
+          plutil -convert binary1 -o "pages/QuickSpend.shortcut" "pages/QuickSpend.shortcut.xml"
+          echo "Shortcut generated."
+
+      - name: Deploy shortcut to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./pages
+          keep_files: false
+          commit_message: "Update QuickSpend shortcut"
 
       - name: Add iOS platform
         run: npx cap add ios

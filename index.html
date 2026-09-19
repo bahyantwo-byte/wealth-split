@@ -603,6 +603,18 @@ input:focus { border-color: var(--dim); }
 <div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
 
 <script>
+// Injected at build time by GitHub Actions (placeholders when running locally)
+const WS_SUPABASE_URL = '__SUPABASE_URL__';
+const WS_SUPABASE_ANON_KEY = '__SUPABASE_ANON_KEY__';
+const WS_SHORTCUT_URL = '__SHORTCUT_URL__';
+function wsCredentials() {
+  const url = (WS_SUPABASE_URL && !WS_SUPABASE_URL.startsWith('__')) ? WS_SUPABASE_URL : localStorage.getItem('ws_sb_url');
+  const key = (WS_SUPABASE_ANON_KEY && !WS_SUPABASE_ANON_KEY.startsWith('__')) ? WS_SUPABASE_ANON_KEY : localStorage.getItem('ws_sb_key');
+  return { url, key };
+}
+function wsBuiltIn() { return WS_SUPABASE_URL && !WS_SUPABASE_URL.startsWith('__'); }
+function wsShortcutUrl() { return (WS_SHORTCUT_URL && !WS_SHORTCUT_URL.startsWith('__')) ? WS_SHORTCUT_URL : null; }
+
 const ICONS = {
   target: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
   close: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
@@ -1776,7 +1788,7 @@ function openProfile() {
     <div class="chip-row" id="lang-chips">${langChips}</div>
     <div class="section-title" style="padding:16px 0 8px">${t('app_section')}</div>
     <div class="profile-menu">
-      <div class="profile-menu-item" id="cloud-sync-btn">${ICONS.trendUp} Cloud Sync Setup<span class="chev">${ICONS.chev}</span></div>
+      <div class="profile-menu-item" id="cloud-sync-btn">${ICONS.trendUp} <span id="sync-menu-label">Quick Entry Setup</span><span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="back-tap-setup-btn">${ICONS.target} Set Up Back Tap<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="export-data-btn">${ICONS.download}${t('export_data')}<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}${t('import_data')}<span class="chev">${ICONS.chev}</span></div>
@@ -1809,6 +1821,8 @@ function openProfile() {
       openProfile();
     });
   });
+  const syncLabel = document.getElementById('sync-menu-label');
+  if (syncLabel) syncLabel.textContent = wsBuiltIn() ? 'Install Shortcut' : 'Quick Entry Setup';
   document.getElementById('cloud-sync-btn').addEventListener('click', () => { closeSheet(); openCloudSyncSetup(); });
   document.getElementById('back-tap-setup-btn').addEventListener('click', () => { closeSheet(); openBackTapGuide(); });
   document.getElementById('export-data-btn').addEventListener('click', exportData);
@@ -2159,6 +2173,34 @@ function openQuickAdd(prefillType) {
 /* ── CAPACITOR URL SCHEME ── */
 /* ── CLOUD SYNC ── */
 function openCloudSyncSetup() {
+  if (wsBuiltIn()) {
+    // Credentials baked in at build time — just show the shortcut install
+    const shortcutUrl = wsShortcutUrl();
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <div class="sheet-head"><h3>⚡ Quick Entry</h3><div class="sheet-close" id="close-sheet" role="button">${ICONS.close}</div></div>
+      <div style="background:var(--bg3);border-radius:16px;padding:18px;margin-bottom:20px;text-align:center">
+        <div style="font-size:2.2rem;margin-bottom:8px">✅</div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:4px">Cloud sync is ready</div>
+        <div style="font-size:0.85rem;color:var(--dim);line-height:1.5">The shortcut will log spending directly — no app required.</div>
+      </div>
+      ${shortcutUrl ? `
+      <p style="font-size:0.88rem;color:var(--dim);margin-bottom:14px;text-align:center;line-height:1.6">Tap below to install the <b style="color:var(--text)">Quick Spend</b> shortcut on your iPhone. It's already set up — just add it.</p>
+      <button class="btn-primary" id="install-shortcut-btn" style="font-size:1rem;padding:16px">⚡ Install Shortcut</button>
+      ` : `
+      <p style="font-size:0.85rem;color:var(--dim);text-align:center;line-height:1.6">Open Back Tap settings and assign the <b style="color:var(--text)">Quick Spend</b> shortcut to double-tap.</p>
+      `}
+      <button class="btn-primary" id="sb-sync-btn" style="background:var(--bg3);color:var(--text);margin-top:10px">Sync Now</button>
+    `);
+    document.getElementById('close-sheet').addEventListener('click', closeSheet);
+    const installBtn = document.getElementById('install-shortcut-btn');
+    if (installBtn) installBtn.addEventListener('click', () => { window.open(shortcutUrl, '_blank'); });
+    const syncBtn = document.getElementById('sb-sync-btn');
+    if (syncBtn) syncBtn.addEventListener('click', () => { closeSheet(); syncFromSupabase(true); });
+    return;
+  }
+
+  // Manual setup (local dev / no secrets)
   const url = localStorage.getItem('ws_sb_url') || '';
   const key = localStorage.getItem('ws_sb_key') || '';
   const connected = url && key;
@@ -2200,8 +2242,7 @@ function openCloudSyncSetup() {
 }
 
 async function syncFromSupabase(showFeedback) {
-  const sbUrl = localStorage.getItem('ws_sb_url');
-  const sbKey = localStorage.getItem('ws_sb_key');
+  const { url: sbUrl, key: sbKey } = wsCredentials();
   if (!sbUrl || !sbKey) return;
   try {
     const res = await fetch(`${sbUrl}/rest/v1/pending_entries?select=*&order=created_at.asc`, {

@@ -324,6 +324,42 @@ input:focus { border-color: var(--dim); }
 .qa-amount-wrap { display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; }
 .qa-amount-wrap .cur { font-size: 1.8rem; font-weight: 800; color: var(--dim); margin-right: 6px; }
 .qa-amount-wrap input { flex: 1; background: none; border: none; outline: none; font-size: 2rem; font-weight: 800; color: var(--text); font-family: 'DM Mono', monospace; width: 100%; }
+
+/* ── QUICK CONFIRM OVERLAY ── */
+#qc-overlay { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.qc-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 28px; padding: 32px 40px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); animation: qcIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.qc-icon { font-size: 2.8rem; margin-bottom: 12px; }
+.qc-amount { font-size: 2.4rem; font-weight: 900; font-family: 'DM Mono', monospace; color: var(--text); }
+.qc-label { font-size: 0.9rem; color: var(--dim); margin-top: 6px; font-weight: 600; }
+.qc-fade { animation: qcOut 0.5s ease forwards; }
+@keyframes qcIn { from { opacity: 0; transform: scale(0.8) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes qcOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.9); } }
+
+/* ── BACK TAP SETUP GUIDE ── */
+#bt-guide { position: fixed; inset: 0; z-index: 250; background: rgba(0,0,0,0.7); display: flex; align-items: flex-end; }
+#bt-guide.hidden { display: none; }
+.bt-sheet { background: var(--bg2); border-radius: 28px 28px 0 0; width: 100%; max-height: 90vh; overflow-y: auto; padding: calc(28px) 24px calc(var(--safe-bottom,0px) + 28px); }
+.bt-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.bt-title { font-size: 1.25rem; font-weight: 900; }
+.bt-close { width: 32px; height: 32px; border-radius: 16px; background: var(--bg4); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.bt-close svg { width: 16px; height: 16px; }
+.bt-sub { color: var(--dim); font-size: 0.88rem; margin-bottom: 24px; }
+.bt-step { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 20px; }
+.bt-num { width: 32px; height: 32px; border-radius: 16px; background: var(--text); color: var(--bg); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 0.9rem; flex-shrink: 0; }
+.bt-step-body { flex: 1; }
+.bt-step-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 3px; }
+.bt-step-desc { font-size: 0.85rem; color: var(--dim); line-height: 1.5; }
+.bt-step-code { font-family: 'DM Mono', monospace; background: var(--bg3); border-radius: 8px; padding: 8px 12px; font-size: 0.82rem; margin-top: 8px; color: var(--text); word-break: break-all; }
+.bt-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 16px; border-radius: 16px; font-weight: 800; font-size: 1rem; cursor: pointer; border: none; margin-top: 8px; margin-bottom: 12px; }
+.bt-btn-primary { background: var(--text); color: var(--bg); }
+.bt-btn-secondary { background: var(--bg3); color: var(--text); }
+.bt-divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.bt-setup-card { background: var(--bg3); border-radius: 18px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; cursor: pointer; margin-bottom: 12px; }
+.bt-setup-icon { font-size: 1.6rem; }
+.bt-setup-text { flex: 1; }
+.bt-setup-title { font-weight: 800; font-size: 0.95rem; }
+.bt-setup-sub { font-size: 0.82rem; color: var(--dim); margin-top: 2px; }
+.bt-setup-arrow { color: var(--dim); font-size: 1.2rem; }
 </style>
 </head>
 <body>
@@ -331,6 +367,67 @@ input:focus { border-color: var(--dim); }
 <div id="onboarding">
   <div class="ob-progress" id="ob-progress"></div>
   <div class="ob-step" id="ob-step-content"></div>
+</div>
+
+<!-- BACK TAP GUIDE OVERLAY -->
+<div id="bt-guide" class="hidden">
+  <div class="bt-sheet">
+    <div class="bt-header">
+      <div class="bt-title">👆 Set Up Back Tap</div>
+      <div class="bt-close" onclick="closeBackTapGuide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+    </div>
+    <div class="bt-sub">Double-tap the back of your iPhone to instantly log spending — without opening the app.</div>
+
+    <div id="bt-step-1">
+      <div class="bt-step">
+        <div class="bt-num">1</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Open the Shortcuts app</div>
+          <div class="bt-step-desc">It's pre-installed on every iPhone. Search for "Shortcuts" if you can't find it.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">2</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Tap the + button → Add Action</div>
+          <div class="bt-step-desc">Search for "Ask for Input" and select it. Set the type to <strong>Number</strong> and the prompt to <strong>"How much did you spend?"</strong></div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">3</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Add a "URL" action</div>
+          <div class="bt-step-desc">Add a URL action and paste this exactly:</div>
+          <div class="bt-step-code" id="bt-url-copy">wealthsplit://add?type=expense&amount=<span style="opacity:0.5">[Provided Input]</span></div>
+          <button class="btn-primary bt-btn" style="margin-top:10px" onclick="copyShortcutUrl()">Copy URL Template</button>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">4</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Add "Open URLs" action</div>
+          <div class="bt-step-desc">This tells the shortcut to open Wealth Split with that URL when it runs.</div>
+        </div>
+      </div>
+      <div class="bt-step">
+        <div class="bt-num">5</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Name it "Quick Spend" and save</div>
+          <div class="bt-step-desc">Tap the ✕ to close and save the shortcut.</div>
+        </div>
+      </div>
+      <hr class="bt-divider">
+      <div class="bt-step">
+        <div class="bt-num">6</div>
+        <div class="bt-step-body">
+          <div class="bt-step-title">Go to Back Tap settings</div>
+          <div class="bt-step-desc">Settings → Accessibility → Touch → Back Tap → Double Tap → select "Quick Spend"</div>
+        </div>
+      </div>
+      <button class="btn-primary bt-btn bt-btn-primary" onclick="openAccessibilitySettings()">Open Accessibility Settings</button>
+      <button class="btn-primary bt-btn bt-btn-secondary" onclick="dismissBackTapGuide()">Got it, all set!</button>
+    </div>
+  </div>
 </div>
 
 <div class="app">
@@ -383,6 +480,16 @@ input:focus { border-color: var(--dim); }
 
     <div class="section-title" data-i18n="your_buckets">Your Buckets</div>
     <div class="bucket-list" id="bucket-list"></div>
+
+    <!-- BACK TAP SETUP CARD (hidden after setup) -->
+    <div id="bt-promo-card" class="bt-setup-card" style="margin-top:20px;display:none" onclick="openBackTapGuide()">
+      <div class="bt-setup-icon">👆</div>
+      <div class="bt-setup-text">
+        <div class="bt-setup-title">Set Up Quick Entry</div>
+        <div class="bt-setup-sub">Double-tap the back of your iPhone to log spending without opening the app</div>
+      </div>
+      <div class="bt-setup-arrow">›</div>
+    </div>
   </div>
 
   <!-- ADD -->
@@ -972,6 +1079,7 @@ function renderHome() {
 
   renderPieChart(total);
   renderDueBanner();
+  showBackTapPromo();
 }
 
 function renderDueBanner() {
@@ -2017,13 +2125,91 @@ function openQuickAdd(prefillType) {
   renderStep();
 })();
 
-/* ── CAPACITOR URL SCHEME: wealthsplit://quick-add?type=expense ── */
+/* ── CAPACITOR URL SCHEME ── */
+/* ── BACK TAP GUIDE ── */
+function openBackTapGuide() {
+  document.getElementById('bt-guide').classList.remove('hidden');
+}
+function closeBackTapGuide() {
+  document.getElementById('bt-guide').classList.add('hidden');
+}
+function dismissBackTapGuide() {
+  localStorage.setItem('ws_bt_setup', '1');
+  document.getElementById('bt-promo-card').style.display = 'none';
+  closeBackTapGuide();
+}
+function copyShortcutUrl() {
+  navigator.clipboard && navigator.clipboard.writeText('wealthsplit://add?type=expense&amount=').catch(() => {});
+  const btn = event.target;
+  btn.textContent = 'Copied!';
+  setTimeout(() => { btn.textContent = 'Copy URL Template'; }, 2000);
+}
+function openAccessibilitySettings() {
+  window.location.href = 'App-prefs:root=ACCESSIBILITY';
+  setTimeout(() => { window.location.href = 'prefs:root=ACCESSIBILITY'; }, 400);
+}
+
+function showBackTapPromo() {
+  if (!localStorage.getItem('ws_bt_setup') && localStorage.getItem('ws_onboarded')) {
+    document.getElementById('bt-promo-card').style.display = 'flex';
+  }
+}
+
+function showQuickConfirm(type, amount) {
+  const existing = document.getElementById('qc-overlay');
+  if (existing) existing.remove();
+  const isExpense = type === 'expense';
+  const el = document.createElement('div');
+  el.id = 'qc-overlay';
+  el.innerHTML = `
+    <div class="qc-card">
+      <div class="qc-icon">${isExpense ? '💸' : '💰'}</div>
+      <div class="qc-amount">${isExpense ? '-' : '+'}${fmt(amount)}</div>
+      <div class="qc-label">${isExpense ? 'Logged as expense' : 'Income received'}</div>
+    </div>`;
+  document.body.appendChild(el);
+  setTimeout(() => { el.classList.add('qc-fade'); }, 1800);
+  setTimeout(() => { el.remove(); }, 2300);
+}
+
+function autoLogFromUrl(type, amount) {
+  const s = load();
+  const amt = parseFloat(amount);
+  if (isNaN(amt) || amt <= 0) return;
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10);
+
+  if (type === 'expense') {
+    const bucket = s.buckets && s.buckets[0];
+    if (!bucket) return;
+    s.transactions = s.transactions || [];
+    s.transactions.push({ id: uid(), bucketId: bucket.id, amount: amt, note: 'Quick entry', date: dateStr, ts: Date.now() });
+    bucket.spent = (bucket.spent || 0) + amt;
+  } else {
+    s.transactions = s.transactions || [];
+    s.transactions.push({ id: uid(), bucketId: null, amount: amt, note: 'Income', date: dateStr, ts: Date.now(), income: true });
+    s.totalIncome = (s.totalIncome || 0) + amt;
+    if (s.buckets) {
+      const total = s.buckets.reduce((sum, b) => sum + (b.pct || 0), 0) || 100;
+      s.buckets.forEach(b => { b.budget = ((b.pct || 0) / total) * s.totalIncome; });
+    }
+  }
+  save(s);
+  showQuickConfirm(type, amt);
+  setTimeout(() => renderHome(), 100);
+}
+
 try {
   if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
     window.Capacitor.Plugins.App.addListener('appUrlOpen', data => {
       try {
         const url = new URL(data.url);
-        if (url.host === 'quick-add' || url.pathname.includes('quick-add')) {
+        const host = url.host;
+        if (host === 'add') {
+          const type = url.searchParams.get('type') || 'expense';
+          const amount = url.searchParams.get('amount') || '0';
+          autoLogFromUrl(type, amount);
+        } else if (host === 'quick-add') {
           const type = url.searchParams.get('type') || 'expense';
           openQuickAdd(type);
         }

@@ -1754,6 +1754,7 @@ function openProfile() {
     <div class="chip-row" id="lang-chips">${langChips}</div>
     <div class="section-title" style="padding:16px 0 8px">${t('app_section')}</div>
     <div class="profile-menu">
+      <div class="profile-menu-item" id="back-tap-setup-btn">${ICONS.target} Set Up Back Tap<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="export-data-btn">${ICONS.download}${t('export_data')}<span class="chev">${ICONS.chev}</span></div>
       <div class="profile-menu-item" id="import-data-btn">${ICONS.upload}${t('import_data')}<span class="chev">${ICONS.chev}</span></div>
       <input type="file" id="import-file-input" accept="application/json" style="display:none">
@@ -1785,6 +1786,7 @@ function openProfile() {
       openProfile();
     });
   });
+  document.getElementById('back-tap-setup-btn').addEventListener('click', () => { closeSheet(); openBackTapGuide(); });
   document.getElementById('export-data-btn').addEventListener('click', exportData);
   document.getElementById('import-data-btn').addEventListener('click', () => {
     document.getElementById('import-file-input').click();

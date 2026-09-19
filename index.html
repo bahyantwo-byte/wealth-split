@@ -286,6 +286,14 @@ input:focus { border-color: var(--dim); }
 .about-box { padding: 14px 15px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--border); }
 .about-name { font-weight: 800; font-size: 0.95rem; }
 .about-desc { font-size: 0.78rem; color: var(--dim); margin-top: 4px; line-height: 1.4; }
+
+/* ── QUICK ADD ── */
+.qa-toggle { display: flex; background: var(--bg3); border-radius: 12px; padding: 3px; margin-bottom: 16px; }
+.qa-tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; font-size: 0.9rem; font-weight: 700; cursor: pointer; color: var(--dim); transition: all 0.18s; }
+.qa-tab.active { background: var(--bg4); color: var(--text); }
+.qa-amount-wrap { display: flex; align-items: center; background: var(--bg3); border: 1px solid var(--border); border-radius: 16px; padding: 14px 18px; margin-bottom: 16px; }
+.qa-amount-wrap .cur { font-size: 1.8rem; font-weight: 800; color: var(--dim); margin-right: 6px; }
+.qa-amount-wrap input { flex: 1; background: none; border: none; outline: none; font-size: 2rem; font-weight: 800; color: var(--text); font-family: 'DM Mono', monospace; width: 100%; }
 </style>
 </head>
 <body>
@@ -1698,6 +1706,104 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+
+/* ── QUICK ADD SHEET ── */
+function openQuickAdd(prefillType) {
+  if (!state.buckets.length) return;
+  let qaType = prefillType === 'income' ? 'income' : 'expense';
+  let qaBucket = state.buckets[0].id;
+
+  openSheet(`
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>Quick Add</h3>
+      <div class="sheet-close" id="qa-close" role="button">${ICONS.close}</div>
+    </div>
+    <div class="qa-toggle" id="qa-toggle">
+      <div class="qa-tab ${qaType === 'expense' ? 'active' : ''}" data-type="expense">Spent</div>
+      <div class="qa-tab ${qaType === 'income' ? 'active' : ''}" data-type="income">Received</div>
+    </div>
+    <div class="qa-amount-wrap">
+      <span class="cur">$</span>
+      <input type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" id="qa-amount" autofocus>
+    </div>
+    <div id="qa-bucket-section" class="field" style="${qaType === 'income' ? 'display:none' : ''}">
+      <label>Bucket</label>
+      <div class="chip-row" id="qa-buckets"></div>
+    </div>
+    <div class="field">
+      <label id="qa-note-label">${qaType === 'expense' ? 'Note (optional)' : 'Source (optional)'}</label>
+      <input type="text" id="qa-note" placeholder="${qaType === 'expense' ? 'What was it for?' : 'Paycheck, side income…'}">
+    </div>
+    <button class="btn-primary" id="qa-submit" disabled>Log</button>
+  `);
+
+  document.getElementById('qa-close').addEventListener('click', closeSheet);
+
+  function renderQABuckets() {
+    const row = document.getElementById('qa-buckets');
+    if (!row) return;
+    row.innerHTML = '';
+    state.buckets.forEach(b => {
+      const chip = document.createElement('div');
+      chip.className = 'chip' + (b.id === qaBucket ? ' active' : '');
+      chip.textContent = b.name;
+      chip.addEventListener('click', () => { qaBucket = b.id; renderQABuckets(); });
+      row.appendChild(chip);
+    });
+  }
+  renderQABuckets();
+
+  document.getElementById('qa-toggle').addEventListener('click', e => {
+    const tab = e.target.closest('[data-type]');
+    if (!tab) return;
+    qaType = tab.dataset.type;
+    document.querySelectorAll('.qa-tab').forEach(t => t.classList.toggle('active', t.dataset.type === qaType));
+    const bs = document.getElementById('qa-bucket-section');
+    if (bs) bs.style.display = qaType === 'income' ? 'none' : '';
+    const nl = document.getElementById('qa-note-label');
+    if (nl) nl.textContent = qaType === 'expense' ? 'Note (optional)' : 'Source (optional)';
+    const ni = document.getElementById('qa-note');
+    if (ni) ni.placeholder = qaType === 'expense' ? 'What was it for?' : 'Paycheck, side income…';
+  });
+
+  document.getElementById('qa-amount').addEventListener('input', () => {
+    const amt = parseFloat(document.getElementById('qa-amount').value);
+    document.getElementById('qa-submit').disabled = !(amt > 0);
+  });
+
+  document.getElementById('qa-submit').addEventListener('click', () => {
+    const amt = parseFloat(document.getElementById('qa-amount').value);
+    const note = (document.getElementById('qa-note').value || '').trim();
+    if (!amt || amt <= 0) return;
+    if (qaType === 'expense') {
+      bucket(qaBucket).balance -= amt;
+      state.transactions.push({ id: uid(), type: 'expense', amount: amt, note: note || t('seg_expense'), date: todayStr(), bucketId: qaBucket });
+    } else {
+      const splits = state.buckets.map(b => ({ bucketId: b.id, amount: Math.round(amt * b.pct) / 100 }));
+      splits.forEach(s => { bucket(s.bucketId).balance += s.amount; });
+      state.transactions.push({ id: uid(), type: 'income', amount: amt, source: note || t('income'), date: todayStr(), splits });
+    }
+    save();
+    closeSheet();
+    renderHome();
+  });
+}
+
+/* ── CAPACITOR URL SCHEME: wealthsplit://quick-add?type=expense ── */
+try {
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+    window.Capacitor.Plugins.App.addListener('appUrlOpen', data => {
+      try {
+        const url = new URL(data.url);
+        if (url.host === 'quick-add' || url.pathname.includes('quick-add')) {
+          const type = url.searchParams.get('type') || 'expense';
+          openQuickAdd(type);
+        }
+      } catch(e) {}
+    });
+  }
+} catch(e) {}
 </script>
 </body>
 </html>

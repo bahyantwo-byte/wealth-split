@@ -975,6 +975,16 @@ function load() {
     if (!parsed.recurring) { parsed.recurring = []; migrated = true; }
     if (!parsed.lang || !LOCALE_MAP[parsed.lang]) { parsed.lang = 'en'; migrated = true; }
     if (typeof parsed.monthlyIncome === 'undefined') { parsed.monthlyIncome = null; migrated = true; }
+    if (parsed.buckets.length) {
+      const validIds = new Set(parsed.buckets.map(b => b.id));
+      const fallbackId = parsed.buckets[0].id;
+      parsed.transactions.forEach(tx => {
+        if (tx.type === 'expense' && tx.bucketId && !validIds.has(tx.bucketId)) { tx.bucketId = fallbackId; migrated = true; }
+      });
+      (parsed.recurring || []).forEach(r => {
+        if (r.bucketId && !validIds.has(r.bucketId)) { r.bucketId = fallbackId; migrated = true; }
+      });
+    }
     if (migrated) localStorage.setItem('wealthSplitData', JSON.stringify(parsed));
     return parsed;
   } catch (e) { return structuredClone(DEFAULT_STATE); }
@@ -2022,7 +2032,7 @@ function openQuickAdd(prefillType) {
 /* ── ONBOARDING ── */
 (function() {
   const alreadyOnboarded = localStorage.getItem('ws_onboarded');
-  if (alreadyOnboarded && state.profile && state.profile.name) {
+  if (alreadyOnboarded) {
     document.getElementById('onboarding').classList.add('hidden');
     return;
   }
@@ -2381,7 +2391,7 @@ async function syncFromSupabase(showFeedback) {
         const bucket = s.buckets && s.buckets[0];
         if (bucket) {
           s.transactions.push({ id: uid(), bucketId: bucket.id, amount: amt, note: 'Quick Entry', date: dateStr, ts: Date.now(), type: 'expense' });
-          bucket.spent = (bucket.spent || 0) + amt;
+          bucket.balance -= amt;
         }
       }
     });
@@ -2470,8 +2480,8 @@ function autoLogFromUrl(type, amount) {
     const bucket = s.buckets && s.buckets[0];
     if (!bucket) return;
     s.transactions = s.transactions || [];
-    s.transactions.push({ id: uid(), bucketId: bucket.id, amount: amt, note: 'Quick entry', date: dateStr, ts: Date.now() });
-    bucket.spent = (bucket.spent || 0) + amt;
+    s.transactions.push({ id: uid(), bucketId: bucket.id, amount: amt, note: 'Quick entry', date: dateStr, ts: Date.now(), type: 'expense' });
+    bucket.balance -= amt;
   } else {
     s.transactions = s.transactions || [];
     s.transactions.push({ id: uid(), bucketId: null, amount: amt, note: 'Income', date: dateStr, ts: Date.now(), income: true });

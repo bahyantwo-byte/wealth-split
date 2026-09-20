@@ -1806,8 +1806,9 @@ function openResetConfirm() {
   document.getElementById('confirm-reset').addEventListener('click', () => {
     state = structuredClone(DEFAULT_STATE);
     save();
+    localStorage.removeItem('ws_onboarded');
     closeSheet();
-    switchTab('home');
+    location.reload();
   });
 }
 
